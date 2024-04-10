@@ -1,0 +1,11 @@
+port: "8080"
+domain: "localhost"
+ageToken: 2592000
+
+db:
+  username: "postgres"
+  host: "localhost"
+  port: "32768"
+  password: "postgrespw"
+  dbname: "postgres"
+  sslmode: "disable"

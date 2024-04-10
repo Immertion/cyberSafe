@@ -1,0 +1,63 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+.body {
+    font-family: 'Arial', sans-serif;
+    background-color: #333;
+    color: white;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+}
+.container {
+    text-align: center;
+    border-radius: 20px;
+    background: #222;
+    padding: 2em;
+    max-width: 700px;
+    width: 100%;
+}
+.title {
+    color: #FFF;
+    font-size: 2em;
+    margin-bottom: 0.5em;
+}
+.description {
+    margin-bottom: 2em;
+    color: #AAA;
+}
+.start-btn {
+    background-color: #7B2EFF;
+    border: none;
+    padding: 1em 2em;
+    font-size: 1em;
+    color: white;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+.start-btn:hover {
+    background-color: #9A4EFF;
+}
+
+.register-invitation {
+    font-size: 16px; 
+    margin-top: 20px;
+    text-align: center;
+}
+
+.register-invitation a {
+    color: #9A4EFF; 
+    text-decoration: none; 
+}
+
+.register-invitation a:hover, .register-invitation a:focus {
+    text-decoration: underline; 
+    color:  #9A4EFF;
+}
