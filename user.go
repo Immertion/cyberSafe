@@ -3,13 +3,13 @@ package structs
 type User struct {
 	Id        int    `json:"id" db:"id"`
 	Login     string `json:"login"`
-	Mail      string `json:"mail" binding:"required" db:"email"`
+	Mail      string `json:"mail" binding:"required" db:"mail"`
 	Password  string `json:"password" binding:"required"`
-	Confirmed bool   `json:"confirmed" binding:"required"`
+	Confirmed bool   `json:"confirmed"`
 }
 
 type UpdateUserInput struct {
 	Id    *int   `json:"id"`
 	Login string `json:"login"`
-	Mail  string `json:"mail" binding:"required" db:"email"`
+	Mail  string `json:"mail" binding:"required" db:"mail"`
 }
