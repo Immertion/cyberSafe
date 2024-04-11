@@ -3,11 +3,10 @@ package main
 import (
 	"context"
 	"cyberSafe/pkg/handler"
-	"cyberSafe/pkg/repository"
+	repository "cyberSafe/pkg/repository"
 	service "cyberSafe/pkg/services"
+	"cyberSafe/server"
 	"log"
-
-	server "cyberSafe"
 
 	"github.com/gin-gonic/gin"
 	_ "github.com/lib/pq"
@@ -31,7 +30,19 @@ func main() {
 
 	logrus.Println("WebSite Started - port:" + viper.GetString("port"))
 
-	repos := repository.NewRepository(nil)
+	db, err := repository.NewPostgresDB(repository.Config{
+		Host:     viper.GetString("db.host"),
+		Port:     viper.GetString("db.port"),
+		Username: viper.GetString("db.username"),
+		DBName:   viper.GetString("db.dbname"),
+		Password: viper.GetString("db.password"),
+		SSLMode:  viper.GetString("db.sslmode"),
+	})
+	if err != nil {
+		logrus.Printf("failed to initialize db: %s", err.Error())
+	}
+
+	repos := repository.NewRepository(db)
 	services := service.NewService(repos)
 	handlers := handler.NewHandler(services)
 
@@ -43,6 +54,10 @@ func main() {
 
 	if err := srv.Shutdown(context.Background()); err != nil {
 		logrus.Errorf("error occured on server shutting down: %s", err.Error())
+	}
+
+	if err := db.Close(); err != nil {
+		logrus.Errorf("error occured on db connection close: %s", err.Error())
 	}
 
 }

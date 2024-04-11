@@ -9,9 +9,6 @@ const Index = () => {
                 <a href="/auth">
                     <button class="start-btn">Log in</button>
                 </a>
-
-                     
-            
             </div>
         </div>
     )
