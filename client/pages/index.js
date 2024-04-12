@@ -1,14 +1,15 @@
+import Link from 'next/link'
 
 const Index = () => {
     return ( 
-        <div class='body'>    
+        <div className='body'>    
         
-            <div class="container">
-                <h1 class="title">Manage your crypto</h1>
-                <p class="description">View balances, make transactions, and access settings securely with CryptoSafe.</p>
-                <a href="/auth">
-                    <button class="start-btn">Log in</button>
-                </a>
+            <div className="container">
+                <h1 className="title">Manage your crypto</h1>
+                <p className="description">View balances, make transactions, and access settings securely with CryptoSafe.</p>
+                <Link href="/auth">
+                        <button className="start-btn">Log in</button>
+                </Link>
             </div>
         </div>
     )

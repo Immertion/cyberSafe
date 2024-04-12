@@ -24,7 +24,7 @@
     width: 100%;
 }
 .title {
-    color: #FFF;
+    color: #7B2EFF;
     font-size: 2em;
     margin-bottom: 0.5em;
 }
@@ -98,4 +98,10 @@
 .graphic img {
     max-width: 100%;
     height: auto;
+}
+
+#error_message{
+    color: rgb(247, 94, 94); 
+    display: none;
+
 }
