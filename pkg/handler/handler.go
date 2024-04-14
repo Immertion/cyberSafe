@@ -20,7 +20,7 @@ func (h *Handler) InitRoutes() *gin.Engine {
 
 	router.Use(cors.New(cors.Config{
 		AllowOrigins:     []string{"http://localhost:3000"},
-		AllowMethods:     []string{"GET", "POST", "OPTIONS"},
+		AllowMethods:     []string{"GET", "POST", "PUT", "OPTIONS"},
 		AllowHeaders:     []string{"Origin", "Content-Type", "Accept"},
 		AllowCredentials: true,
 	}))
@@ -30,6 +30,11 @@ func (h *Handler) InitRoutes() *gin.Engine {
 	router.POST("/sign-in", h.signIn)
 
 	router.POST("/sign-out", h.signOut)
+
+	activation := router.Group("/activation")
+	{
+		activation.PUT("/check/:id", h.checkActivationUser)
+	}
 
 	// router.Use(spa.Middleware("/", "./client/out"))
 

@@ -1,10 +1,13 @@
 import { useState } from 'react';
+import Link from 'next/link'
+import { useRouter } from 'next/router';
+
 
 function checkPasswords(password, confirmPassword) {
     var errorMessage = document.getElementById('error_message');
   
     if (password !== confirmPassword) {
-      errorMessage.textContent = "Passwords don't match!";
+      errorMessage.textContent = "Passwords don't match";
       errorMessage.style.display = 'block';  // Показать сообщение об ошибке
       return false;
     } else {
@@ -12,15 +15,48 @@ function checkPasswords(password, confirmPassword) {
     }
     return true;
   }
+  function printErrorMessage(status) {
+    var errorMessage = document.getElementById('error_message_code');
+  
+    if (status == 400){
+        errorMessage.textContent = "Invalid code";
+        errorMessage.style.display = 'block';
+    }
+
+    else{
+        errorMessage.style.display = 'none';
+    }
+
+  }
+
+function accExists(requestStatus){
+    var errorMessage = document.getElementById('error_message');
+  
+    if (requestStatus == 400) {
+      errorMessage.textContent = "Account already exists";
+      errorMessage.style.display = 'block';  // Показать сообщение об ошибке
+      return false;
+    } else {
+      errorMessage.style.display = 'none';  // Скрыть сообщение об ошибке
+    }
+    return true;
+}
+
+
 
 const Register = () => {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [login, setLogin] = useState('');
     const [repeatPassword, setRepeatPassword] = useState('');
+    const [code, setCode] = useState('');
+    const [id, setId] = useState('');
+    const router = useRouter();
+
 
     const handleSubmit = async (event) => {
         event.preventDefault(); // Предотвращаем стандартную отправку формы
+
 
         if (checkPasswords(password, repeatPassword)){
             const loginData = {
@@ -28,6 +64,9 @@ const Register = () => {
                 mail: email,
                 password: password,
             };
+
+
+            document.getElementById('loadingBackground').style.display = 'flex'
     
             try {
                 const request = await fetch('http://localhost:8080/sign-up', {
@@ -43,21 +82,76 @@ const Register = () => {
                 if (request.ok) {
                     // Обработка успешного ответа
                     console.log('Login success');
-                    // Здесь можно добавить действия после успешного логина, например, редирект
+
+                    document.getElementById('modalBackground').style.display = 'flex'
+                    document.getElementById('modalBackground').addEventListener('click', function(event) {
+                        if (event.target === this) {
+                          this.style.display = 'none';
+                        }
+                      });
+
                 } else {
-                    // Обработка ошибок от сервера
+                    accExists(request.status)
                     console.log('Login failed');
                 }
                 const response = await request.json()
-                console.log(response)
+                setId(response.id)
+
+                document.getElementById('loadingBackground').style.display = 'none'
+
+
             } catch (error) {
                 // Обработка ошибок запроса
                 console.error('Failed to submit form', error);
             }
             };
+
+
+
+
+
+            // document.getElementById('loadingBackground').style.display = 'none'
+            // document.getElementById('modalBackground').style.display = 'flex'
+
         }
 
+        const codeSumbit = async (event) => {
+            event.preventDefault(); // Предотвращаем стандартную отправку формы
 
+            const codeActivate = {
+                code: code,
+            };
+
+                try {
+                    const request = await fetch('http://localhost:8080/activation/check/' + id, {
+                        method: 'PUT',
+           
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify(codeActivate),
+                    });
+                    console.log(request)
+                    
+                    if (request.ok) {
+                        localStorage.setItem("activateAcc", true);
+
+                        router.push("auth")
+                    } else {
+                        showNotification();
+                    }
+                    printErrorMessage(request.status)
+                    const response = await request.json()
+                    console.log(response)
+                } 
+                catch (error) {
+                    // Обработка ошибок запроса
+                    console.error('Failed to submit form', error);
+                }
+        };
+            
+
+        
 
     return ( 
         
@@ -106,9 +200,37 @@ const Register = () => {
                 </form>
                 <br></br>
                 <div id="error_message"></div>
-            <p className="register-invitation">If you already have an account, <a href="auth">click here</a> to log in.</p>
+            <p className="register-invitation">If you already have an account, 
+            <Link href="auth"> click here </Link> to log in.</p>
 
             </div>
+            <div id="modalBackground" className="modal-background">
+                <div id="codeModal" className="modal">
+                    <p className="codeActiv">Please enter your code:</p>
+                    <form onSubmit={codeSumbit}>
+                        <input 
+                            type="text" 
+                            id="codeInput" 
+                            placeholder='Code'
+                            required
+                            value={code}
+                            onChange={(e) => setCode(e.target.value)}
+                            />
+                        <br></br>
+                <div id="error_message_code"></div>
+
+                        <button id="confirmCode" className="button">Enter</button>
+
+                    </form>
+                </div>
+            </div>
+
+
+            <div id="loadingBackground" className="loading-background">
+                <div className="spinner"></div>
+            </div>
+
+
 
             <style jsx>
             {`
@@ -130,11 +252,21 @@ const Register = () => {
                     outline: none;
                 }
 
-                
+                .codeActiv{
+                    font-size: 1.4em;
+                    margin-bottom: 1em;
+                    color: #afaabe
+                }
+
+
+                  
             
+                  
             `}
         </style>
+
         </div>
+
 
 
     )

@@ -28,11 +28,11 @@ func (h *Handler) signUp(c *gin.Context) {
 		return
 	}
 
-	// err = h.services.SendCodeActivation(id)
-	// if err != nil {
-	// 	newErrorResponse(c, http.StatusInternalServerError, err.Error())
-	// 	return
-	// }
+	err = h.services.SendCodeActivation(id)
+	if err != nil {
+		newErrorResponse(c, http.StatusInternalServerError, err.Error())
+		return
+	}
 
 	c.JSON(http.StatusOK, map[string]interface{}{
 		"id": id,
@@ -85,4 +85,31 @@ func (h *Handler) signOut(c *gin.Context) {
 	c.SetCookie("jwtToken", "", -1, "/", domain, false, true)
 
 	c.JSON(http.StatusOK, "ok")
+}
+
+type Message struct {
+	Code string `json:"code" binding:"required"`
+}
+
+func (h *Handler) checkActivationUser(c *gin.Context) {
+	userId, _ := getUserId(c)
+
+	var code Message
+
+	if err := c.BindJSON(&code); err != nil {
+		c.JSON(http.StatusBadRequest, "Wrong content")
+		return
+	}
+
+	verified, err := h.services.CheckCodeActivation(userId, code.Code)
+	if err != nil {
+		newErrorResponse(c, http.StatusInternalServerError, err.Error())
+		return
+	}
+	if !verified {
+		c.JSON(http.StatusBadRequest, "Code is not correct")
+		return
+	}
+
+	c.JSON(http.StatusOK, "Successfully")
 }

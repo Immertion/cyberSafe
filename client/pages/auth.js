@@ -1,10 +1,33 @@
-import { useState } from 'react';
+"use client"
+import { useState, useEffect } from 'react';
+import Cookies from 'js-cookie';
+import Link from 'next/link'
+import { useRouter } from 'next/router';
 
-function printErrorMessage(status, text) {
+
+
+function showNotification() {
+    var notification = document.getElementById('notification');
+    notification.classList.add('show-notification');
+    
+    // Удалить классы анимации, чтобы сбросить анимацию исчезновения
+    notification.classList.remove('fade-out');
+    
+    // Скрыть уведомление после отображения
+    setTimeout(function() {
+        notification.classList.add('fade-out');
+    }, 3000); // Показать уведомление на 3 секунды, затем начать исчезновение
+    }
+
+function printErrorMessage(status) {
     var errorMessage = document.getElementById('error_message');
   
     if (status == 400){
-        errorMessage.textContent = text;
+        errorMessage.textContent = "Invalid username or password";
+        errorMessage.style.display = 'block';
+    }
+    else if (status == 401){
+        errorMessage.textContent = "Your account has been created but not activated";
         errorMessage.style.display = 'block';
     }
     else{
@@ -13,9 +36,30 @@ function printErrorMessage(status, text) {
 
   }
 
+
+
 const Auth = () => {
+    const router = useRouter();
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
+    const token = Cookies.get('jwtToken');
+    
+    
+
+    if (token != null){
+        router.push("home")
+    }
+
+    if (typeof window !== 'undefined') {
+        var stateActivateAcc = localStorage.getItem("activateAcc");
+    
+        if (stateActivateAcc === "true") {
+            useEffect(() => {
+                showNotification();
+            })
+            localStorage.clear();
+        }
+    }
 
     
     const handleSubmit = async (event) => {
@@ -35,14 +79,14 @@ const Auth = () => {
                 },
                 body: JSON.stringify(loginData),
             });
+            const response = await request.json()
+
 
             if (request.ok) {
-                console.log('Login success');
-            } else {
-                console.log('Login failed');
+                Cookies.set('jwtToken', response.token, { expires: 7 });
+                router.push("home")
             }
-            const response = await request.json()
-            printErrorMessage(request.status, "Invalid username or password!")
+            printErrorMessage(request.status)
             
 
         } catch (error) {
@@ -54,9 +98,13 @@ const Auth = () => {
     };
 
     return (
+
         <div className='body'>
+        <div id="notification" className="notification">The account has been created</div>
+
+            
             <div className="container">
-                <h1 className="title">Log in</h1>
+                <h1 className="title">Sign in</h1>
                 <p className="description">Please enter your credentials:</p>
                 <form onSubmit={handleSubmit}>
                     <input
@@ -80,8 +128,9 @@ const Auth = () => {
                 <br></br>
                 <div id="error_message"></div>
 
-                <p className="register-invitation">If you are not registered yet, <a href="register">click here</a> to sign in.</p>
+                <p className="register-invitation">If you are not registered yet, <Link href="register"> click here </Link> to sign in.</p>
             </div>
+
             <style jsx>
             {`
                 input[type="text"],

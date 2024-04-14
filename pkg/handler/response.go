@@ -14,6 +14,6 @@ func newErrorResponse(c *gin.Context, statusCode int, message string) {
 	c.AbortWithStatusJSON(statusCode, errorResponse{message})
 }
 
-func newResponse(c *gin.Context, statusCode int, message string) {
-	c.AbortWithStatusJSON(statusCode, errorResponse{message})
-}
+// func newResponse(c *gin.Context, statusCode int, message string) {
+// 	c.AbortWithStatusJSON(statusCode, errorResponse{message})
+// }
