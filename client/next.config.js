@@ -1,17 +1,18 @@
 /**
- * @type {import('next').NextConfig}
+//  * @type {import('next').NextConfig}
  */
 const nextConfig = {
-    output: 'export',
-   
-    // Optional: Change links /me -> /me/ and emit /me.html -> /me/index.html
-    // trailingSlash: true,
-   
-    // Optional: Prevent automatic /me -> /me/, instead preserve href
-    // skipTrailingSlashRedirect: true,
-   
-    // Optional: Change the output directory out -> dist
-    // distDir: 'dist',
-  }
+    exportPathMap: async function (
+    ) {
+      return {
+        '/': { page: '/' },
+        '/auth': { page: '/auth', query: { title: 'auth' } },
+        '/register': { page: '/register', query: { title: 'register' } },
+        '/home': { page: '/home', query: { title: 'home' } },
+        output: 'export',
+
+      };
+    }
+  };
    
   module.exports = nextConfig

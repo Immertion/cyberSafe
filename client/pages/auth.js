@@ -44,8 +44,6 @@ const Auth = () => {
     const [password, setPassword] = useState('');
     const token = Cookies.get('jwtToken');
     
-    
-
     if (token != null){
         router.push("home")
     }
@@ -53,12 +51,14 @@ const Auth = () => {
     if (typeof window !== 'undefined') {
         var stateActivateAcc = localStorage.getItem("activateAcc");
     
-        if (stateActivateAcc === "true") {
-            useEffect(() => {
+        useEffect(() => {
+            if (stateActivateAcc === "true") {
                 showNotification();
-            })
-            localStorage.clear();
-        }
+                localStorage.clear();
+            }}
+
+        )
+        
     }
 
     
@@ -84,11 +84,9 @@ const Auth = () => {
 
             if (request.ok) {
                 Cookies.set('jwtToken', response.token, { expires: 7 });
-                router.push("home")
+                router.replace("home")
             }
             printErrorMessage(request.status)
-            
-
         } catch (error) {
             console.error('Failed to submit form', error);
         }

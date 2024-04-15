@@ -17,6 +17,7 @@ type Config struct {
 
 const (
 	userTable = `users`
+	keysTable = `crypto_keys`
 )
 
 func NewPostgresDB(cfg Config) (*sqlx.DB, error) {

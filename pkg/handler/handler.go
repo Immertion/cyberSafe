@@ -21,7 +21,7 @@ func (h *Handler) InitRoutes() *gin.Engine {
 	router.Use(cors.New(cors.Config{
 		AllowOrigins:     []string{"http://localhost:3000"},
 		AllowMethods:     []string{"GET", "POST", "PUT", "OPTIONS"},
-		AllowHeaders:     []string{"Origin", "Content-Type", "Accept"},
+		AllowHeaders:     []string{"Origin", "Content-Type", "Accept", "Authorization"},
 		AllowCredentials: true,
 	}))
 
@@ -34,6 +34,11 @@ func (h *Handler) InitRoutes() *gin.Engine {
 	activation := router.Group("/activation")
 	{
 		activation.PUT("/check/:id", h.checkActivationUser)
+	}
+
+	wallet := router.Group("/wallet")
+	{
+		wallet.GET("/etc", h.GetEthBalanceById)
 	}
 
 	// router.Use(spa.Middleware("/", "./client/out"))

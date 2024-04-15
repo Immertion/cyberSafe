@@ -26,6 +26,16 @@ func getJWT(h *Handler, c *gin.Context) (int, bool, error) {
 	return userId, Confirmed, nil
 }
 
+func parseJWT(h *Handler, token string) (int, bool, error) {
+
+	userId, Confirmed, err := h.services.ParseToken(token)
+	if err != nil {
+		return 0, false, err
+	}
+
+	return userId, Confirmed, nil
+}
+
 func (h *Handler) userIdentify(c *gin.Context) {
 	_, isVerificated, err := getJWT(h, c)
 	if err != nil || !isVerificated {

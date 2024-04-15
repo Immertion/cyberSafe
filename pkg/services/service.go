@@ -3,6 +3,7 @@ package service
 import (
 	user "cyberSafe"
 	"cyberSafe/pkg/repository"
+	"math/big"
 )
 
 type Authorization interface {
@@ -16,14 +17,26 @@ type Mail interface {
 	CheckCodeActivation(id int, rdmKey string) (bool, error)
 }
 
+type GenerateKeys interface {
+	GenerateKeysEtherium(user_id int) error
+}
+
+type Crypto interface {
+	GetBalanceETC(id int) (*big.Float, *big.Float, error)
+}
+
 type Service struct {
 	Authorization
 	Mail
+	GenerateKeys
+	Crypto
 }
 
 func NewService(repos *repository.Repository) *Service {
 	return &Service{
 		NewAuthService(repos.Authorization),
 		NewSendMessageService(repos.Mail),
+		NewGenerateKeysService(repos.CryptoAddress),
+		NewCryptoService(repos.CryptoAddress),
 	}
 }

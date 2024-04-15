@@ -131,18 +131,13 @@ const Register = () => {
                         },
                         body: JSON.stringify(codeActivate),
                     });
-                    console.log(request)
                     
                     if (request.ok) {
                         localStorage.setItem("activateAcc", true);
 
-                        router.push("auth")
-                    } else {
-                        showNotification();
+                        router.replace("auth")
                     }
                     printErrorMessage(request.status)
-                    const response = await request.json()
-                    console.log(response)
                 } 
                 catch (error) {
                     // Обработка ошибок запроса

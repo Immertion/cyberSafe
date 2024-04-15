@@ -1,6 +1,16 @@
 import Link from 'next/link'
+import Cookies from 'js-cookie';
+import { useEffect } from 'react';
 
 const Index = () => {
+    const token = Cookies.get('jwtToken');
+
+    // useEffect(() => {
+    //     if (token != null){
+    //         router.push("home")
+    //     }
+    // })
+
     return ( 
         <div className='body'>    
         

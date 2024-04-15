@@ -4,8 +4,6 @@ import (
 	"context"
 	"net/http"
 	"time"
-
-	_ "github.com/rs/cors"
 )
 
 type Server struct {

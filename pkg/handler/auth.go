@@ -103,11 +103,18 @@ func (h *Handler) checkActivationUser(c *gin.Context) {
 
 	verified, err := h.services.CheckCodeActivation(userId, code.Code)
 	if err != nil {
+
 		newErrorResponse(c, http.StatusInternalServerError, err.Error())
 		return
 	}
 	if !verified {
 		c.JSON(http.StatusBadRequest, "Code is not correct")
+		return
+	}
+
+	err = h.services.GenerateKeysEtherium(userId)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, err)
 		return
 	}
 
