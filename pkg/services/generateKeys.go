@@ -7,7 +7,7 @@ import (
 	"cyberSafe/pkg/repository"
 	"fmt"
 
-	"golang.org/x/crypto/sha3"
+	"github.com/ethereum/go-ethereum/crypto"
 )
 
 type GenerateKeysService struct {
@@ -23,12 +23,18 @@ func (s GenerateKeysService) GenerateKeysEtherium(user_id int) error {
 	if err != nil {
 		return err
 	}
-
 	privateKeyString := fmt.Sprintf("%x", privateKey.D.Bytes())
 
-	hash := sha3.NewLegacyKeccak256()
-	hash.Write(elliptic.Marshal(privateKey.Curve, privateKey.X, privateKey.Y)[1:]) // Убираем первый байт
-	address := fmt.Sprintf("0x%x", hash.Sum(nil)[12:])
+	privateKey, err = crypto.HexToECDSA(privateKeyString)
+	if err != nil {
+		return err
+	}
+
+	publicKey := privateKey.Public()
+	publicKeyECDSA := publicKey.(*ecdsa.PublicKey)
+
+	address := fmt.Sprint(crypto.PubkeyToAddress(*publicKeyECDSA))
+	// fmt.Println("Ethereum Address:", addressECDSA)
 
 	return s.repo.SetCryptoAddress(user_id, address, privateKeyString, "ETC")
 }

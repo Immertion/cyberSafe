@@ -147,11 +147,42 @@ const Auth = () => {
                     outline: none;
                 }
             
+                .notification {
+                    background-color: #333; /* Темный фон */
+                    color: #fff; /* Белый текст */
+                    padding: 10px 20px; /* Паддинг внутри */
+                    border-radius: 3px; /* Скругленные углы */
+                    box-shadow: 0px 0px 10px rgba(0,0,0,0.3); /* Тень для объемности */
+                    position: fixed; /* Фиксированное позиционирование */
+                    top: 20px; /* Отступ сверху */
+                    right: -300px; /* Спрятать справа */
+                    z-index: 3000; /* Повыше других элементов */
+                    transition: right 0.5s; /* Анимация появления и исчезновения */
+                  }
+                  
+                  /* Класс для показа уведомления */
+                  .show-notification {
+                    right: 20px; /* Переместить в видимую область */
+                  }
+                  
+                  /* Анимация исчезновения */
+                  @keyframes fadeOut {
+                    from { opacity: 1; }
+                    to { opacity: 0; }
+                  }
+                  
+                  /* Применить анимацию исчезновения к уведомлению */
+                  .fade-out {
+                    animation: fadeOut 0.5s ease-in-out forwards;
+                    animation-delay: 2.5s; /* Задержка перед началом исчезновения */
+                  }
             `}
         </style>
         </div>
         
     );
 };
+
+
 
 export default Auth;

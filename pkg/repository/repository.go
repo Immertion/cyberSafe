@@ -20,6 +20,7 @@ type Mail interface {
 type CryptoAddress interface {
 	SetCryptoAddress(user_id int, publicKey, privateKey, network string) error
 	GetEthBalance(id int) (*big.Float, *big.Float, error)
+	GetAddressETC(id int) (string, error)
 }
 
 type Repository struct {

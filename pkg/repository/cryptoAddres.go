@@ -4,13 +4,16 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"io/ioutil"
 	"math"
 	"math/big"
 	"net/http"
+	"time"
 
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/ethclient"
 	"github.com/jmoiron/sqlx"
+	"github.com/sirupsen/logrus"
 )
 
 type CryptoAddressPostgress struct {
@@ -22,27 +25,45 @@ func NewCryptoAddress(db *sqlx.DB) *CryptoAddressPostgress {
 }
 
 type Response struct {
-	Ethereum struct {
-		Usd float64 `json:"usd"`
-	} `json:"ethereum"`
+	CurrentPrice float64 `json:"current_price"`
+}
+
+var currentPriceETHtoUSD float64
+
+func BalanceETHtoUSD() {
+
+	go func() {
+		for now := range time.Tick(time.Minute) {
+			url := "https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&ids=ethereum&YOUR_API_KEY=CG-ZGGmfKAQj2FCLiRRkhhLRtna"
+			resp, err := http.Get(url)
+			if err != nil {
+				return
+			}
+			defer resp.Body.Close()
+
+			body, err := ioutil.ReadAll(resp.Body)
+			if err != nil {
+				return
+
+			}
+
+			var ethereums []Response
+			if err = json.Unmarshal(body, &ethereums); err != nil {
+				return
+			}
+			currentPriceETHtoUSD = ethereums[0].CurrentPrice
+
+			logrus.Printf("Последнее обновление ETH было %s\n", now)
+		}
+	}()
 }
 
 func getEthPrice(ETC *big.Float) *big.Float {
-	resp, err := http.Get("https://api.coingecko.com/api/v3/simple/price?ids=ethereum&vs_currencies=USD")
-	if err != nil {
-		return nil
-	}
-	defer resp.Body.Close()
-
-	var response Response
-	if err := json.NewDecoder(resp.Body).Decode(&response); err != nil {
-		return nil
-	}
 
 	EtcInUsd := new(big.Float)
 	balanceInUSD := new(big.Float)
-	// fmt.Println(response.Ethereum.Usd)
-	return balanceInUSD.Mul(EtcInUsd.SetFloat64(response.Ethereum.Usd), ETC)
+
+	return balanceInUSD.Mul(EtcInUsd.SetFloat64(currentPriceETHtoUSD), ETC)
 }
 
 func (r *CryptoAddressPostgress) SetCryptoAddress(user_id int, publicKey, privateKey, network string) error {
@@ -81,4 +102,16 @@ func (r *CryptoAddressPostgress) GetEthBalance(id int) (*big.Float, *big.Float, 
 	balanceInUSD := getEthPrice(balanceInEth)
 
 	return balanceInEth, balanceInUSD, nil
+}
+
+func (r *CryptoAddressPostgress) GetAddressETC(id int) (string, error) {
+	var address string
+
+	query := fmt.Sprintf("SELECT address FROM %s WHERE id_user=$1", keysTable)
+	err := r.db.Get(&address, query, id)
+	if err != nil {
+		return "", err
+	}
+
+	return address, nil
 }

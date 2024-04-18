@@ -10,7 +10,7 @@ import (
 
 type Balance struct {
 	ConvertToUsd  *big.Float `json:"balanceUsd"    binding:"required"`
-	BalanceCrypto *big.Float `json:"balanceCrypto" binding:"required"`
+	BalanceCrypto float64    `json:"balanceCrypto" binding:"required"`
 }
 
 func (h *Handler) GetEthBalanceById(c *gin.Context) {
@@ -31,8 +31,29 @@ func (h *Handler) GetEthBalanceById(c *gin.Context) {
 	}
 	var balance Balance
 
-	balance.BalanceCrypto = balanceEtc
+	balanceETC, _ := balanceEtc.Float64()
+	balance.BalanceCrypto = balanceETC
 	balance.ConvertToUsd = balanceUsd
 
 	c.JSON(http.StatusOK, balance)
+}
+
+func (h *Handler) GetAddressETCById(c *gin.Context) {
+
+	authHeader := c.GetHeader("Authorization")
+	token := strings.TrimPrefix(authHeader, "Bearer ")
+
+	userId, _, err := parseJWT(h, token)
+	if err != nil {
+		newErrorResponse(c, http.StatusBadRequest, err.Error())
+		return
+	}
+
+	address, err := h.services.GetAddressETC(userId)
+	if err != nil {
+		newErrorResponse(c, http.StatusInternalServerError, err.Error())
+		return
+	}
+
+	c.JSON(http.StatusOK, address)
 }

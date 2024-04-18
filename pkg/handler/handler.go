@@ -5,6 +5,7 @@ import (
 
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
+	"github.com/mandrigin/gin-spa/spa"
 )
 
 type Handler struct {
@@ -38,10 +39,12 @@ func (h *Handler) InitRoutes() *gin.Engine {
 
 	wallet := router.Group("/wallet")
 	{
-		wallet.GET("/etc", h.GetEthBalanceById)
+		wallet.GET("/balanceETC", h.GetEthBalanceById)
+		wallet.GET("/addressETC", h.GetAddressETCById)
+
 	}
 
-	// router.Use(spa.Middleware("/", "./client/out"))
+	router.Use(spa.Middleware("/", ".client/out"))
 
 	return router
 }

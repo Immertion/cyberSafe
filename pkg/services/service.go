@@ -23,6 +23,7 @@ type GenerateKeys interface {
 
 type Crypto interface {
 	GetBalanceETC(id int) (*big.Float, *big.Float, error)
+	GetAddressETC(id int) (string, error)
 }
 
 type Service struct {

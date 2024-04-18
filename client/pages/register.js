@@ -253,7 +253,51 @@ const Register = () => {
                     color: #afaabe
                 }
 
-
+                .modal-background {
+                    display: none; /* Скрыть по умолчанию */
+                    position: fixed; /* Фиксированное позиционирование */
+                    top: 0;
+                    left: 0;
+                    width: 100%;
+                    height: 100%;
+                    background-color: rgba(0, 0, 0, 0.7); /* Полупрозрачный черный фон */
+                    z-index: 1000; /* Повыше других элементов */
+                    justify-content: center;
+                    align-items: center;
+                  }
+                  
+                  .modal {
+                    background: #232323; /* Цвет фона аналогичный окну регистрации */
+                    padding: 20px;
+                    border-radius: 10px; /* Скругленные углы как у поля ввода */
+                    width: 400px; /* Ширина модального окна */
+                    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5); /* Тень для объемности */
+                    text-align: center; /* Текст по центру */
+                    color: #fff; /* Белый текст */
+                  }
+                  
+                  .modal input[type="text"] {
+                    width: 95%; /* Ширина ввода, чтобы оставить немного пространства */
+                    margin-top: 10px;
+                    padding: 10px; /* Паддинг как у полей в форме регистрации */
+                    border: none; /* Убрать границу */
+                    border-radius: 5px; /* Скругленные углы */
+                    margin-bottom: 20px; /* Отступ снизу */
+                  }
+                  
+                  .modal button {
+                    padding: 10px 20px; /* Паддинг как у кнопки регистрации */
+                    border: none; /* Убрать границу */
+                    border-radius: 5px; /* Скругленные углы */
+                    background-color: #6a5acd; /* Фиолетовый цвет кнопки */
+                    color: #fff; /* Белый текст */
+                    cursor: pointer; /* Курсор в виде руки для интерактивности */
+                    margin-top: 10px; /* Отступ сверху */
+                  }
+                  
+                  .modal button:hover {
+                    background-color: #7b68ee; /* Чуть светлее при наведении */
+                  }
                   
             
                   

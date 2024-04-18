@@ -21,6 +21,7 @@ func initConfig() error {
 }
 
 func main() {
+	repository.BalanceETHtoUSD()
 
 	logrus.SetFormatter(new(logrus.JSONFormatter))
 
