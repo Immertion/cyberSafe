@@ -7,11 +7,6 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-const (
-	authorizationHeader = "Authorization"
-	userCtx             = "userId"
-)
-
 func getJWT(h *Handler, c *gin.Context) (int, bool, error) {
 	token, err := c.Cookie("jwtToken")
 	if err != nil {

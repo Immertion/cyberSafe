@@ -52,8 +52,8 @@ func (s SendMessageService) SendCodeActivation(id int) error {
 	return nil
 
 }
-func (s SendMessageService) CheckCodeActivation(id int, rdmKey string) (bool, error) {
-	return s.repo.CheckCodeActivation(id, rdmKey)
+func (s SendMessageService) CheckCodeActivation(id int, rdmKey, iconURL string) (bool, error) {
+	return s.repo.CheckCodeActivation(id, rdmKey, iconURL)
 }
 
 func randInt(min int, max int) int {

@@ -20,3 +20,15 @@ func (s CryptoService) GetBalanceETC(id int) (*big.Float, *big.Float, error) {
 func (s CryptoService) GetAddressETC(id int) (string, error) {
 	return s.repo.GetAddressETC(id)
 }
+
+func (s CryptoService) GetAddressGasUsd() (*big.Float, error) {
+	return s.repo.GetAddressGasUsd()
+}
+
+func (s CryptoService) CreateTransaction(id int, amount float64, toAddressString string) (string, error) {
+	return s.repo.CreateTransaction(id, amount, toAddressString)
+}
+
+func (s CryptoService) GetIdenIcon(id int) (string, error) {
+	return s.repo.GetIdenIcon(id)
+}

@@ -14,13 +14,16 @@ type Authorization interface {
 
 type Mail interface {
 	SendCodeActivation(id int, rdmKey string) (string, error)
-	CheckCodeActivation(id int, rdmKey string) (bool, error)
+	CheckCodeActivation(id int, rdmKey, iconURL string) (bool, error)
 }
 
 type CryptoAddress interface {
 	SetCryptoAddress(user_id int, publicKey, privateKey, network string) error
 	GetEthBalance(id int) (*big.Float, *big.Float, error)
 	GetAddressETC(id int) (string, error)
+	GetIdenIcon(id int) (string, error)
+	GetAddressGasUsd() (*big.Float, error)
+	CreateTransaction(id int, amount float64, toAddressString string) (string, error)
 }
 
 type Repository struct {

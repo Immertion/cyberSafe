@@ -88,7 +88,8 @@ func (h *Handler) signOut(c *gin.Context) {
 }
 
 type Message struct {
-	Code string `json:"code" binding:"required"`
+	Code     string `json:"code" binding:"required"`
+	BlockURL string `json:"icon_url" binding:"required"`
 }
 
 func (h *Handler) checkActivationUser(c *gin.Context) {
@@ -101,9 +102,8 @@ func (h *Handler) checkActivationUser(c *gin.Context) {
 		return
 	}
 
-	verified, err := h.services.CheckCodeActivation(userId, code.Code)
+	verified, err := h.services.CheckCodeActivation(userId, code.Code, code.BlockURL)
 	if err != nil {
-
 		newErrorResponse(c, http.StatusInternalServerError, err.Error())
 		return
 	}

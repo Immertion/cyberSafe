@@ -118,8 +118,15 @@ const Register = () => {
         const codeSumbit = async (event) => {
             event.preventDefault(); // Предотвращаем стандартную отправку формы
 
+            var newBlockie = blockies.create({
+                seed: address,
+                size: 10,
+                scale: 8,
+            }).toDataURL();
+
             const codeActivate = {
                 code: code,
+                icon_url: newBlockie,
             };
 
                 try {

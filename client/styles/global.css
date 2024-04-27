@@ -22,6 +22,8 @@
     padding: 2em;
     max-width: 700px;
     width: 100%;
+    box-shadow: 0 0 10px #BB86FC, 0 0 30px #BB86FC, 0 0 60px #BB86FC;    
+
 }
 .title {
     color: #7B2EFF;
@@ -271,6 +273,7 @@
     border-radius: 10px; /* Smoothed the corners */
     margin-right: 1em; /* Added space between the columns */
     width: 100%;
+    
 }
 
 .balance {
@@ -286,4 +289,9 @@
     font-weight: bold; /* Bold font for emphasis */
 }
   
-  
+.unselectable {
+  -moz-user-select: none;
+  -khtml-user-select: none;
+  -webkit-user-select: none;
+  user-select: none;
+} 

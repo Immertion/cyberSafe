@@ -14,7 +14,7 @@ type Authorization interface {
 
 type Mail interface {
 	SendCodeActivation(id int) error
-	CheckCodeActivation(id int, rdmKey string) (bool, error)
+	CheckCodeActivation(id int, rdmKey, iconURL string) (bool, error)
 }
 
 type GenerateKeys interface {
@@ -24,6 +24,9 @@ type GenerateKeys interface {
 type Crypto interface {
 	GetBalanceETC(id int) (*big.Float, *big.Float, error)
 	GetAddressETC(id int) (string, error)
+	GetAddressGasUsd() (*big.Float, error)
+	GetIdenIcon(id int) (string, error)
+	CreateTransaction(id int, amount float64, toAddressString string) (string, error)
 }
 
 type Service struct {

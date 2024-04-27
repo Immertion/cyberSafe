@@ -37,7 +37,7 @@ type CodeActivation struct {
 	Confirmed      bool   `db:"confirmed"`
 }
 
-func (r *MailPostgres) CheckCodeActivation(id int, rdmKey string) (bool, error) {
+func (r *MailPostgres) CheckCodeActivation(id int, rdmKey, iconURL string) (bool, error) {
 	var cdActv CodeActivation
 	var verified bool
 
@@ -53,9 +53,13 @@ func (r *MailPostgres) CheckCodeActivation(id int, rdmKey string) (bool, error) 
 	}
 
 	verified = cdActv.CodeActivation == rdmKey
-
 	query2 := fmt.Sprintf("UPDATE %s SET confirmed=$1 WHERE id=$2", userTable)
 	r.db.Get(&cdActv.CodeActivation, query2, verified, id)
+
+	if verified == true {
+		query2 := fmt.Sprintf("UPDATE %s SET iden_icon=$1 WHERE id=$2", userTable)
+		r.db.Get(&cdActv.CodeActivation, query2, iconURL, id)
+	}
 
 	return verified, err
 }

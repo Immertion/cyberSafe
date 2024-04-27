@@ -57,3 +57,54 @@ func (h *Handler) GetAddressETCById(c *gin.Context) {
 
 	c.JSON(http.StatusOK, address)
 }
+
+func (h *Handler) GetGasPrice(c *gin.Context) {
+
+	gasPrice, err := h.services.GetAddressGasUsd()
+	if err != nil {
+		newErrorResponse(c, http.StatusInternalServerError, err.Error())
+		return
+	}
+
+	c.JSON(http.StatusOK, gasPrice)
+}
+
+type sendDataTransaction struct {
+	Address string  `json:"address" binding:"required"`
+	Amount  float64 `json:"amount" binding:"required"`
+}
+
+func (h *Handler) SendTransactionETH(c *gin.Context) {
+	var input sendDataTransaction
+
+	if err := c.BindJSON(&input); err != nil {
+		newErrorResponse(c, http.StatusBadRequest, err.Error())
+		return
+	}
+	// gasPrice, err := h.services.GetAddressGasUsd()
+	// if err != nil {
+	// 	newErrorResponse(c, http.StatusInternalServerError, err.Error())
+	// 	return
+	// }
+
+	c.JSON(http.StatusOK, input)
+}
+
+func (h *Handler) GetIconURL(c *gin.Context) {
+	authHeader := c.GetHeader("Authorization")
+	token := strings.TrimPrefix(authHeader, "Bearer ")
+
+	userId, _, err := parseJWT(h, token)
+	if err != nil {
+		newErrorResponse(c, http.StatusBadRequest, err.Error())
+		return
+	}
+
+	blockURL, err := h.services.GetIdenIcon(userId)
+	if err != nil {
+		newErrorResponse(c, http.StatusInternalServerError, err.Error())
+		return
+	}
+
+	c.JSON(http.StatusOK, blockURL)
+}

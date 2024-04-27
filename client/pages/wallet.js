@@ -66,8 +66,7 @@ const Wallet = () => {
               this.style.display = 'none';
             }
           });
-    };
-
+    };    
     useEffect(() => {
         fetch("http://localhost:8080/wallet/balanceETC",{
             method: 'GET',
@@ -82,7 +81,7 @@ const Wallet = () => {
             return response.json();
         })
         .then(data => {
-            setBalance((((data)["balanceCrypto"])) + " ETC")
+            setBalance((("balance - " +(data)["balanceCrypto"])) + " ETC")
 
             document.getElementById('spinner').style.display = 'none'
     })
@@ -96,7 +95,7 @@ const Wallet = () => {
         <div className="body">
 
             <header>
-                <div className="navbar">
+                <div className="navbar unselectable">
                     <div className="logo ">
                         CryptoSafe
                         </div>
@@ -117,12 +116,14 @@ const Wallet = () => {
         <div className="content">
             <Image src={ethLogo}
                 alt="etcLogo"
+                className='unselectable'
                 width={30}
                 height={30}>
             </Image>
             <div className="address">{address}</div>
             <button  onClick={() => copyToClipboard(address)} className="copy-button icon-button">
             <Image src={copyIcon}
+                className='unselectable'
                 alt="copyIcon"
                 width={30}
                 height={30}>
@@ -130,6 +131,7 @@ const Wallet = () => {
              </button>
              <button  onClick={() => GetQRCode()} className="copy-button icon-button">
             <Image src={qrIcon}
+                className='unselectable'
                 alt="qrIcon"
                 width={30}
                 height={30}>
@@ -138,7 +140,7 @@ const Wallet = () => {
 
 
         </div>
-        <div className="address">balance - {balance}</div>
+        <div className="address">{balance}</div>
 
         {notification && <div className="notification">{notification}</div>}
            
@@ -152,7 +154,7 @@ const Wallet = () => {
         </div>
                 
             <footer>
-                <div className="footer-container">
+                <div className="footer-container unselectable">
                     <p>CryptoSafe</p>
                 </div>
             </footer>
@@ -168,11 +170,9 @@ const Wallet = () => {
                 text-align: center; /* Align text to the left for a cleaner look */
                 border-radius: 50px; /* Smoothed the corners */
                 background: #222;
-                max-width: 1200px;
-                width: 50%;
-                box-shadow: 0 4px 16px rgba(0, 0, 0, 0.7); 
-
-  
+                max-width: 1000px;
+                width: 40%;
+                box-shadow: 0 0 10px #BB86FC, 0 0 30px #BB86FC, 0 0 60px #BB86FC;
               }
 
             .container-qr {

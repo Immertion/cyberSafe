@@ -37,10 +37,17 @@ func (h *Handler) InitRoutes() *gin.Engine {
 		activation.PUT("/check/:id", h.checkActivationUser)
 	}
 
+	user := router.Group("/user")
+	{
+		user.GET("blockURL", h.GetIconURL)
+
+	}
 	wallet := router.Group("/wallet")
 	{
 		wallet.GET("/balanceETC", h.GetEthBalanceById)
 		wallet.GET("/addressETC", h.GetAddressETCById)
+		wallet.GET("/gasPrice", h.GetGasPrice)
+		wallet.POST("/sendETH", h.SendTransactionETH)
 
 	}
 

@@ -2,6 +2,7 @@ package repository
 
 import (
 	"context"
+	"crypto/ecdsa"
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
@@ -11,9 +12,10 @@ import (
 	"time"
 
 	"github.com/ethereum/go-ethereum/common"
+	"github.com/ethereum/go-ethereum/core/types"
+	"github.com/ethereum/go-ethereum/crypto"
 	"github.com/ethereum/go-ethereum/ethclient"
 	"github.com/jmoiron/sqlx"
-	"github.com/sirupsen/logrus"
 )
 
 type CryptoAddressPostgress struct {
@@ -30,10 +32,12 @@ type Response struct {
 
 var currentPriceETHtoUSD float64
 
+const timeLimit = 20
+
 func BalanceETHtoUSD() {
 
 	go func() {
-		for now := range time.Tick(time.Minute) {
+		for _ = range time.Tick(time.Second * timeLimit) {
 			url := "https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&ids=ethereum&YOUR_API_KEY=CG-ZGGmfKAQj2FCLiRRkhhLRtna"
 			resp, err := http.Get(url)
 			if err != nil {
@@ -53,7 +57,7 @@ func BalanceETHtoUSD() {
 			}
 			currentPriceETHtoUSD = ethereums[0].CurrentPrice
 
-			logrus.Printf("Последнее обновление ETH было %s\n", now)
+			// logrus.Printf("Последнее обновление ETH было %s\n", now)
 		}
 	}()
 }
@@ -114,4 +118,97 @@ func (r *CryptoAddressPostgress) GetAddressETC(id int) (string, error) {
 	}
 
 	return address, nil
+}
+
+func (r *CryptoAddressPostgress) GetAddressGasUsd() (*big.Float, error) {
+	wei := 1e18
+
+	infura_client, err := ethclient.Dial("https://mainnet.infura.io/v3/c902a2bbbb964fbf91e82557534a826e")
+	if err != nil {
+		return nil, err
+	}
+
+	gasPrice, err := infura_client.SuggestGasPrice(context.Background())
+	if err != nil {
+		return nil, err
+	}
+
+	gasPriceInEth := new(big.Float).Quo(new(big.Float).SetInt(gasPrice), big.NewFloat(wei))
+
+	gasPriceInUSD := new(big.Float).Mul(gasPriceInEth, big.NewFloat(currentPriceETHtoUSD))
+
+	return gasPriceInUSD, nil
+}
+
+func (r *CryptoAddressPostgress) CreateTransaction(id int, amount float64, toAddressString string) (string, error) {
+	wei := big.NewInt(1e18)
+	var privateKeyString string
+
+	query := fmt.Sprintf("SELECT private_key FROM %s WHERE id_user=$1", keysTable)
+	err := r.db.Get(&privateKeyString, query, id)
+	if err != nil {
+		return "", err
+	}
+	privateKey, err := crypto.HexToECDSA(privateKeyString)
+	if err != nil {
+		return "nil", nil
+	}
+	client, err := ethclient.Dial("https://mainnet.infura.io/v3/c902a2bbbb964fbf91e82557534a826e")
+	if err != nil {
+		return "nil", err
+	}
+
+	publicKey := privateKey.Public()
+	publicKeyECDSA := publicKey.(*ecdsa.PublicKey)
+
+	fromAddress := crypto.PubkeyToAddress(*publicKeyECDSA)
+
+	nonce, err := client.PendingNonceAt(context.Background(), fromAddress)
+	if err != nil {
+		return "nil", err
+	}
+
+	val := big.NewFloat(amount)
+	value := new(big.Int)
+	val.Mul(val, new(big.Float).SetInt(wei))
+	value, _ = val.Int(nil)
+	gasLimit := uint64(21000) // in units
+	gasPrice, err := client.SuggestGasPrice(context.Background())
+	if err != nil {
+		return "nil", err
+	}
+
+	toAddress := common.HexToAddress(toAddressString)
+
+	tx := types.NewTransaction(nonce, toAddress, value, gasLimit, gasPrice, nil)
+	chainID, err := client.NetworkID(context.Background())
+	if err != nil {
+		return "nil", err
+	}
+
+	signedTx, err := types.SignTx(tx, types.NewEIP155Signer(chainID), privateKey)
+	if err != nil {
+		return "nil", err
+	}
+
+	err = client.SendTransaction(context.Background(), signedTx)
+	if err != nil {
+		return "nil", err
+	}
+
+	txHash := signedTx.Hash().Hex()
+
+	return txHash, nil
+}
+
+func (r *CryptoAddressPostgress) GetIdenIcon(id int) (string, error) {
+	var blokiesURL string
+
+	query := fmt.Sprintf("SELECT iden_icon FROM %s WHERE id=$1", userTable)
+	err := r.db.Get(&blokiesURL, query, id)
+	if err != nil {
+		return "", err
+	}
+
+	return blokiesURL, nil
 }
