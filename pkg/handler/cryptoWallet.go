@@ -81,13 +81,23 @@ func (h *Handler) SendTransactionETH(c *gin.Context) {
 		newErrorResponse(c, http.StatusBadRequest, err.Error())
 		return
 	}
-	// gasPrice, err := h.services.GetAddressGasUsd()
-	// if err != nil {
-	// 	newErrorResponse(c, http.StatusInternalServerError, err.Error())
-	// 	return
-	// }
 
-	c.JSON(http.StatusOK, input)
+	authHeader := c.GetHeader("Authorization")
+	token := strings.TrimPrefix(authHeader, "Bearer ")
+
+	userId, _, err := parseJWT(h, token)
+	if err != nil {
+		newErrorResponse(c, http.StatusBadRequest, err.Error())
+		return
+	}
+
+	txHash, err := h.services.CreateTransaction(userId, input.Amount, input.Address)
+	if err != nil {
+		newErrorResponse(c, http.StatusInternalServerError, err.Error())
+		return
+	}
+
+	c.JSON(http.StatusOK, txHash)
 }
 
 func (h *Handler) GetIconURL(c *gin.Context) {

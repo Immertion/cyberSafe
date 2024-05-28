@@ -83,8 +83,10 @@ const Home = () => {
     const [balance, setBalance] = useState('');
     const [showModal, setShowModal] = useState(false);
     const [amount, setAmount] = useState('');
+    const [address, setAddress] = useState('');
     const [idenCoin, setIdenCoin] = useState('');
     const [accIdenCoin, setAccIdenCoin] = useState('');
+
     var accIcon 
 
     useEffect(() => {
@@ -118,26 +120,63 @@ const Home = () => {
     })
 
 
-
-    fetch("http://localhost:8080/user/blockURL", {
-        method: 'GET',
-        headers: {
-            'Authorization': 'Bearer ' + token,
-        },
+    useEffect(() => {
+        fetch("http://localhost:8080/user/blockURL", {
+            method: 'GET',
+            headers: {
+                'Authorization': 'Bearer ' + token,
+            },
+        })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok ' + response.statusText);
+                }
+                return response.json();
+            })
+            .then(data => {
+                accIcon = data
+            })
+            .catch(error => {
+                console.error('There was a problem with your fetch operation:', error);
+            });
     })
-        .then(response => {
-            if (!response.ok) {
-                throw new Error('Network response was not ok ' + response.statusText);
+
+    const sendCrypto = async (event) => {
+        event.preventDefault(); // Предотвращаем стандартную отправку формы
+        console.log(typeof parseInt(amount))
+
+
+        const transactionData = {
+            amount: parseInt(amount),
+            address: address,
+        };
+        
+        try {
+            const request = await fetch('http://localhost:8080/wallet/sendETH', {
+                method: 'POST',
+   
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': 'Bearer ' + token,
+                },
+                body: JSON.stringify(transactionData),
+            });
+            const response = await request.json()
+            response.txHash = txHash
+
+            if (request.ok) {
+                console.log('Successfully created transaction')
             }
-            return response.json();
-        })
-        .then(data => {
-            accIcon = data
-        })
-        .catch(error => {
-            console.error('There was a problem with your fetch operation:', error);
-        });
-    
+            else{
+                console.log('Failed created transaction')
+            }
+        } catch (error) {
+            console.error('Failed created transaction', error);
+        }
+
+
+
+    };
 
 
     const handleOpenModal = () => {
@@ -151,6 +190,7 @@ const Home = () => {
 
     const checkAddressETH = (e) => {
         validEthereumAddress(e.target.value)
+        setAddress(e.target.value);
     };
 
 
@@ -158,6 +198,7 @@ const Home = () => {
     function validEthereumAddress(address) {
         var errorMessage = document.getElementById('error_message');
         var idencoin = document.getElementById('idencoin');
+        console.log(document.getElementById('idencoin'))
         var accIdenCoin = document.getElementById('accidencoin');
         var newBlockie = GeneratedIcon(address);
 
@@ -192,7 +233,7 @@ const Home = () => {
                     <div className="nav-links">
                         <Link href="/home" className="active">Home</Link>
                         <Link href="/wallet">Wallets</Link>
-                        <Link href="/transactions">Transactions</Link>
+                        <Link href="/transaction">Transactions</Link>
                         <Link href="/security">Security</Link>
                     </div>
                     <div className="search-bar">
@@ -232,7 +273,7 @@ const Home = () => {
                     <div className="modal-trans" onClick={(e) => e.stopPropagation()}>
                         <div className="modal-header">Transaction</div>
                         <div className="modal-body">
-                            <form>
+                            <form onSubmit={sendCrypto}>
 
                                 <label htmlFor="wallet">Wallet:</label>
                                 <select id="wallet" name="wallet">

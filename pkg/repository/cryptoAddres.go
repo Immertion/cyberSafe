@@ -168,7 +168,7 @@ func (r *CryptoAddressPostgress) CreateTransaction(id int, amount float64, toAdd
 		return "nil", err
 	}
 
-	val := big.NewFloat(amount)
+	val := big.NewFloat(amount / currentPriceETHtoUSD)
 	value := new(big.Int)
 	val.Mul(val, new(big.Float).SetInt(wei))
 	value, _ = val.Int(nil)

@@ -81,7 +81,7 @@ const Wallet = () => {
             return response.json();
         })
         .then(data => {
-            setBalance((("balance - " +(data)["balanceCrypto"])) + " ETC")
+            setBalance((("balance - " +(data)["balanceCrypto"])) + " ETH")
 
             document.getElementById('spinner').style.display = 'none'
     })
@@ -102,7 +102,7 @@ const Wallet = () => {
                     <div className="nav-links">
                         <Link href="home" >Home</Link>
                         <Link href="wallet" className="active">Wallets</Link>
-                        <Link href="#">Transactions</Link>
+                        <Link href="transaction">Transactions</Link>
                         <Link href="security">Security</Link>
                     </div>
                     <div className="search-bar">
@@ -263,9 +263,8 @@ const Wallet = () => {
                 cursor: pointer;
                 // background-color: #555;
                 border-radius: 20%;
-        
-                
               }
+              
               .notification {
                 position: fixed;
                 right: 20px;

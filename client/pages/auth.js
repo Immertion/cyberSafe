@@ -98,9 +98,7 @@ const Auth = () => {
     return (
 
         <div className='body'>
-        <div id="notification" className="notification">The account has been created</div>
-
-            
+        <div id="notification" className="notification">The account has been created</div>            
             <div className="container">
                 <h1 className="title">Sign in</h1>
                 <p className="description">Please enter your credentials:</p>
