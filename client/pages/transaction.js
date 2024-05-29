@@ -7,9 +7,17 @@ import copyIcon from "../images/copy.svg"
 import etherscanIcon from "../images/etherscan-logo-circle.svg"
 import { useRouter } from 'next/router'
 
+import WalletSearch from '../components/WalletSearch';
+
 const apiKey = "U9ZR3EP6E9VZ2KGXQDM9JP5YDAXP9SB2Z5"
 const pageSize = 10
+const start = 0
 
+const getStatusClass = (status) => {
+    if (status === "1") return "success";
+    if (status === "0") return "failed";
+    return "pending";
+};
 
 const Transaction = () => {
     const [address, setAddress] = useState('')
@@ -19,9 +27,10 @@ const Transaction = () => {
     const [transactions, setTransactions] = useState([]);
     const [loading, setLoading] = useState(true);
     const [page, setPage] = useState(1);
-    const [total, setTotal] = useState(0);
+    const [ethToUsd, setEthToUsd] = useState(0);
+    const [total, setTotal] = useState(1);
     const router = useRouter()
-
+    
     useEffect(() => {
         if (token == null){
             router.push("auth")
@@ -67,18 +76,38 @@ const Transaction = () => {
         }
     };
 
-    
+    const fetchEthToUsd = async () => {
+        try {
+            const res = await fetch('https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&ids=ethereum&YOUR_API_KEY=CG-ZGGmfKAQj2FCLiRRkhhLRtna');
+            const data = await res.json();
+            setEthToUsd(data[0].current_price);
+        } catch (error) {
+            console.error("Error fetching ETH to USD price:", error);
+        }
+    };
+    const fetchAllTrancations = async () => {
+        try {
+            const res = await fetch(`https://api.etherscan.io/api?module=account&action=txlist&address=${address}&startblock=0&endblock=99999999&page=${start}&offset=${pageSize}&sort=desc&apikey=${apiKey}`);
+            const data = await res.json();
+            
+            if (data.status === "1") {
+                setTotal(data.result.length);
+            } else {
+                console.error("Failed to fetch all transactions:", data.message);
+            }
+        } catch (error) {
+            console.error("Error fetching all transactions:", error);
+        }
+    };
+
     const fetchTransactions = async (page) => {
         setLoading(true);
         try {
-            const offset = (page - 1) * pageSize;
             const res = await fetch(`https://api.etherscan.io/api?module=account&action=txlist&address=${address}&startblock=0&endblock=99999999&page=${page}&offset=${pageSize}&sort=desc&apikey=${apiKey}`);
             const data = await res.json();
-            console.log(page)
             
             if (data.status === "1") {
                 setTransactions(data.result || []);
-                setTotal(data.result.length * pageSize);  // Обновляем общее количество транзакций
             } else {
                 console.error("Failed to fetch transactions:", data.message);
             }
@@ -91,7 +120,9 @@ const Transaction = () => {
 
     useEffect(() => {
         if (addressLoaded) {
+            fetchAllTrancations();
             fetchTransactions(page);
+            fetchEthToUsd();
         }
     }, [addressLoaded, page]);
 
@@ -112,8 +143,7 @@ const Transaction = () => {
                         <Link href="security">Security</Link>
                     </div>
                     <div className="search-bar">
-                        <input type="search" placeholder="Search"/>
-                        <button type="submit">🔍</button>
+                        <WalletSearch />
                     </div>
                 </div>
             </header>
@@ -121,16 +151,19 @@ const Transaction = () => {
             
             <div className="container">
                 <div className="transactionList">
-                    {loading ? (
-                    <div>Loading...</div> ) : transactions.length > 0 ? (
+                    {loading ? ( <div id="spinner" className="spinner"></div> ) : transactions.length > 0 ? (
                     transactions.map((transaction) => (
                         <div key={transaction.hash} className="transaction">
                             <div>
                                 <div className="time">Date: {formatDate(transaction.timeStamp)}</div>
                             </div>
+        
                             <div className={transaction.to.toLowerCase() === address.toLowerCase() ? "amountIn" : "amountOut"}>
                                 {transaction.to.toLowerCase() === address.toLowerCase() ? '+' : '-'}
-                                {weiToEth(transaction.value)} ETH
+                                {weiToEth(transaction.value)} ETH (${(weiToEth(transaction.value) * ethToUsd).toFixed(2)})
+                            </div>
+                            <div className="fee">
+                                Fee: {weiToEth(transaction.gasUsed * transaction.gasPrice)} ETH (${(weiToEth(transaction.gasUsed * transaction.gasPrice) * ethToUsd).toFixed(2)})
                             </div>
                             <div className={"hash"}>
                                 <span>txHash: {transaction.hash}</span>
@@ -143,6 +176,10 @@ const Transaction = () => {
                                 </Image>
                                 </button>
                             </div>
+                            <div className={`${"status"} ${getStatusClass(transaction.txreceipt_status)}`}>
+                                Status: {transaction.txreceipt_status === "1" ? "Success" : transaction.txreceipt_status === "0" ? "Failed" : "Pending"}
+                            </div>
+                           
                             <a href={`https://etherscan.io/tx/${transaction.hash}`} className="link" target="_blank" rel="noopener noreferrer">
                                 <Image src={etherscanIcon}
                                     className='unselectable Image'
@@ -152,29 +189,33 @@ const Transaction = () => {
                                 </Image> Etherscan</a>
                             </div>
                         ))
+                        
+                        
                     ) : (
                     <div>No transactions found for this account.</div>
+                    
                     )}
                     </div>
+
+            {!loading && transactions.length > 0 && (
             <div className="pagination">
-                <button 
-                    onClick={() => setPage(page - 1)} 
+                <button
+                    onClick={() => setPage(page - 1)}
                     disabled={page === 1}
-                    className="pageButton"
-                >
-                    Previous
+                    className="pageButton">
+                    «
                 </button>
-                <span className="pageInfo">Page {page} </span>
-                <button 
-                    onClick={() => setPage(page + 1)} 
+                <span className="pageInfo"> Page {page} of {Math.ceil(total / pageSize)} </span>
+                <button
+                    onClick={() => setPage(page + 1)}
                     disabled={page >= Math.ceil(total / pageSize)}
-                    className="pageButton"
-                >
-                    Next
+                    className="pageButton">
+                    »
                 </button>
             </div>
-                </div>
-            
+        )}
+        </div>
+        
 
             {notification && <div className="notification">{notification}</div>}
             <footer>
@@ -229,6 +270,24 @@ const Transaction = () => {
                 font-size: 16px;
             }
             
+            .status {
+                display: flex;
+                justify-content: flex-end;
+                font-weight: bold;
+            }
+            
+            .status.success {
+                color: #4caf50;
+            }
+            
+            .status.failed {
+                color: #f44336;
+            }
+            
+            .status.pending {
+                color: #ff9800;
+            }
+
             .amountIn {
                 color: green;
                 font-size: 18px;
@@ -238,7 +297,10 @@ const Transaction = () => {
                 color: red;
                 font-size: 18px;
             }
-            
+            .fee {
+                color: #ccc;
+                margin-top: 5px;
+            }
             .hash {
                 display: flex;
                 align-items: center;
@@ -320,7 +382,11 @@ const Transaction = () => {
                 // background-color: #555;
                 border-radius: 20%;
               }
-
+              .spinner{
+                margin-left: 48%;
+                
+            }
+            
             
 
             .notification {

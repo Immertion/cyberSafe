@@ -8,6 +8,8 @@ import Cookies from 'js-cookie';
 import { useRouter } from 'next/router'
 import QRCode from 'qrcode.react';
 
+import WalletSearch from '../components/WalletSearch';
+
 
 const imageLoader = ({ src}) => {
     return `${src}`
@@ -91,6 +93,8 @@ const Wallet = () => {
     })
 
 
+
+
     return ( 
         <div className="body">
 
@@ -106,8 +110,7 @@ const Wallet = () => {
                         <Link href="security">Security</Link>
                     </div>
                     <div className="search-bar">
-                        <input type="search" placeholder="Search"/>
-                        <button type="submit">🔍</button>
+                        <WalletSearch />
                     </div>
                 </div>
             </header>

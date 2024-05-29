@@ -2,6 +2,7 @@ import Link from 'next/link'
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/router'
 import Cookies from 'js-cookie';
+import WalletSearch from '../components/WalletSearch';
 
 const Security = () => {
     const router = useRouter()
@@ -33,8 +34,7 @@ const Security = () => {
                         <Link href="security" className="active">Security</Link>
                     </div>
                     <div className="search-bar">
-                        <input type="search" placeholder="Search"/>
-                        <button type="submit">🔍</button>
+                        <WalletSearch />
                     </div>
                 </div>
             </header>

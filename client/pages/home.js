@@ -4,6 +4,21 @@ import Cookies from 'js-cookie';
 import { useRouter } from 'next/router';
 import { useEffect, useState } from 'react';
 import blockies from 'ethereum-blockies';
+import { Line } from 'react-chartjs-2';
+import { Chart as ChartJS, LineElement, PointElement, LinearScale, Title, CategoryScale, Tooltip } from 'chart.js';
+
+import moment from 'moment';
+
+ChartJS.register(LineElement, PointElement, LinearScale, Title, CategoryScale, Tooltip);
+
+import WalletSearch from '../components/WalletSearch';
+
+
+const myAddress = "0x36571670965758bC0b7e90bb7ebdD202489Af418";
+const apiKey = "U9ZR3EP6E9VZ2KGXQDM9JP5YDAXP9SB2Z5";
+const pageSize = 1000;
+const weiToEth = (wei) => (wei / 1e18).toFixed(6);
+
 
 function GeneratedIcon(address){
     var newBlockie = blockies.create({
@@ -84,8 +99,14 @@ const Home = () => {
     const [showModal, setShowModal] = useState(false);
     const [amount, setAmount] = useState('');
     const [address, setAddress] = useState('');
+    const [addressAcc, setAddressAcc] = useState('');
     const [idenCoin, setIdenCoin] = useState('');
     const [accIdenCoin, setAccIdenCoin] = useState('');
+    const [transactions, setTransactions] = useState([]);
+    const [loading, setLoading] = useState(true);
+    const [page, setPage] = useState(1);
+    const [addressLoaded, setAddressLoaded] = useState(false);
+    const [ethToUsd, setEthToUsd] = useState(0);
 
     var accIcon 
 
@@ -119,6 +140,27 @@ const Home = () => {
             });
     })
 
+    useEffect(() => {
+        const fetchAddress = async () => {
+            try {
+                const response = await fetch("http://localhost:8080/wallet/addressETC", {
+                    method: 'GET',
+                    headers: {
+                        'Authorization': 'Bearer ' + token,
+                    },
+                });
+                if (!response.ok) {
+                    throw new Error('Network response was not ok ' + response.statusText);
+                }
+                const data = await response.json();
+                setAddressAcc(data);
+                setAddressLoaded(true); 
+            } catch (error) {
+                console.error('There was a problem with your fetch operation:', error);
+            }
+        };
+        fetchAddress();
+    })
 
     useEffect(() => {
         fetch("http://localhost:8080/user/blockURL", {
@@ -223,6 +265,147 @@ const Home = () => {
         }
     }
 
+
+    const fetchEthToUsd = async () => {
+        try {
+            const res = await fetch('https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&ids=ethereum&YOUR_API_KEY=CG-ZGGmfKAQj2FCLiRRkhhLRtna');
+            const data = await res.json();
+            setEthToUsd(data[0].current_price);
+        } catch (error) {
+            console.error("Error fetching ETH to USD price:", error);
+        }
+    };
+
+
+
+    const fetchTransactions = async () => {
+        setLoading(true);
+        try {
+            const res = await fetch(`https://api.etherscan.io/api?module=account&action=txlist&address=${addressAcc}&startblock=0&endblock=99999999&sort=asc&apikey=${apiKey}`);
+            const data = await res.json();
+
+            if (data.status === "1") {
+                setTransactions(data.result || []);
+            } else {
+                console.error("Failed to fetch transactions:", data.message);
+            }
+        } catch (error) {
+            console.error("Error fetching transactions:", error);
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    
+
+    useEffect(() => {
+        if (addressLoaded) {
+            fetchTransactions();
+            fetchEthToUsd();
+        }
+    }, [addressLoaded, page]);
+
+
+    const filterAndSummarizeTransactions = (transactions, myAddress) => {
+        const oneWeekAgo = moment().subtract(7, 'days').startOf('day');
+        const today = moment().endOf('day');
+        const dates = [];
+    
+        for (let m = moment(oneWeekAgo); m.isBefore(today); m.add(1, 'days')) {
+            dates.push(m.format('YYYY-MM-DD'));
+        }
+    
+        const summary = transactions.reduce((acc, tx) => {
+            const date = moment.unix(tx.timeStamp).format('YYYY-MM-DD');
+            const value = parseFloat(weiToEth(tx.value));
+            const fee = parseFloat(weiToEth(tx.gasUsed * tx.gasPrice)); // Calculate the fee
+    
+            if (!acc[date]) {
+                acc[date] = 0;
+            }
+    
+            if (tx.to && tx.to.toLowerCase() === addressAcc.toLowerCase()) {
+                // Positive transaction: subtract fee from value
+                acc[date] += (value - fee);
+            } else {
+                // Negative transaction: add fee to value
+                acc[date] -= (value + fee);
+            }
+    
+            return acc;
+        }, {});
+    
+        const labels = dates;
+        const values = dates.map(date => summary[date] || 0);
+    
+        return { labels, values };
+    };
+    const { labels, values } = filterAndSummarizeTransactions(transactions, addressAcc);
+    
+    const data = {
+        labels,
+        datasets: [
+            {
+                label: 'Transaction Value (ETH)',
+                data: values,
+                fill: true,
+                backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                borderColor: 'rgba(75, 192, 192, 1)',
+                pointBackgroundColor: 'rgba(75, 192, 192, 1)',
+                tension: 0.4,
+            },
+        ],
+    };
+    
+    const options = {
+        responsive: true,
+        plugins: {
+            legend: {
+                position: 'top',
+            },
+            title: {
+                display: true,
+                text: 'Transaction History (Last 7 Days)',
+                font: {
+                    size: 24
+                }
+            },
+            tooltip: {
+                callbacks: {
+                    label: function(context) {
+                        let label = context.dataset.label || '';
+                        if (label) {
+                            label += ': ';
+                        }
+                        label += `${context.raw} ETH`;
+                        return label;
+                    },
+                    footer: function(context) {
+                        const valueInEth = context[0].raw;
+                        const valueInUsd = (valueInEth * ethToUsd).toFixed(2);
+                        return `Value: $${valueInUsd} USD`;
+                    }
+                }
+            }
+        },
+        scales: {
+            x: {
+                title: {
+                    display: true,
+                    text: 'Date',
+                },
+            },
+            y: {
+                title: {
+                    display: true,
+                    text: 'Value',
+                },
+            },
+        },
+    };
+    
+
+
     return (
         <div className="body">
             <header>
@@ -237,8 +420,7 @@ const Home = () => {
                         <Link href="/security">Security</Link>
                     </div>
                     <div className="search-bar">
-                        <input type="search" placeholder="Search" />
-                        <button type="submit">🔍</button>
+                        <WalletSearch />
                     </div>
                 </div>
             </header>
@@ -259,9 +441,22 @@ const Home = () => {
                     </div>
                     <div className="right-pane">
                         <div className="transactions">
-                            <h2 className="h-tran">Transactions history</h2>
-                            <div className="chart">
-                                {/* Chart will be here */}
+                            {/* <div className="chart"> */}
+                            <div>
+                                {loading ? (
+                                    <div className="loading-text">
+                                    <span>L</span>
+                                    <span>o</span>
+                                    <span>a</span>
+                                    <span>d</span>
+                                    <span>i</span>
+                                    <span>n</span>
+                                    <span>g</span>
+                                </div>
+                                ) : (
+                                    <Line data={data} options={options} />
+                                )}
+                            {/* </div> */}
                             </div>
                         </div>
                     </div>
@@ -343,13 +538,62 @@ const Home = () => {
             .h-tran{
                 padding: 20px
             }
-
             .spinner{
                 margin-left: 10%;
                 margin-top: 5%;
                 
             }
-            
+            .loading-text {
+                position: absolute;
+                top: 50%;
+                left: 60%;
+                transform: translate(-50%, -50%);
+                font-size: 40px;
+                font-weight: bold;
+                color: #3498db;
+                text-align: center;
+              }
+              
+              .loading-text span {
+                display: inline-block;
+                animation: loadingAnimation 1s infinite;
+              }
+              
+              .loading-text span:nth-child(2) {
+                animation-delay: 0.2s;
+              }
+              
+              .loading-text span:nth-child(3) {
+                animation-delay: 0.4s;
+              }
+              
+              .loading-text span:nth-child(4) {
+                animation-delay: 0.6s;
+              }
+              
+              .loading-text span:nth-child(5) {
+                animation-delay: 0.8s;
+              }
+              
+              .loading-text span:nth-child(6) {
+                animation-delay: 1s;
+              }
+              
+              @keyframes loadingAnimation {
+                0% {
+                  transform: scale(1);
+                  opacity: 1;
+                }
+                50% {
+                  transform: scale(1.5);
+                  opacity: 0.5;
+                }
+                100% {
+                  transform: scale(1);
+                  opacity: 1;
+                }
+              }
+              
             .balance-container {
                 display: flex;
                 justify-content: center;

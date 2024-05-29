@@ -298,3 +298,56 @@
   -webkit-user-select: none;
   user-select: none;
 } 
+
+@media (max-width: 768px) {
+    .navbar {
+        padding: 1em;
+    }
+
+    .navbar .nav-links {
+        flex-direction: column;
+        width: 100%;
+    }
+
+    .navbar .nav-links a {
+        width: 100%;
+        padding: 1em;
+        text-align: center;
+    }
+
+    .navbar .search-bar {
+        width: 100%;
+        margin-top: 1em;
+    }
+
+    .navbar .search-bar input[type="search"] {
+        width: 70%;
+    }
+
+    .navbar .search-bar button {
+        width: 20%;
+    }
+
+    .split-container {
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .left-pane, .right-pane {
+        width: 100%;
+        margin: 0;
+    }
+
+    .container {
+        padding: 1em;
+        box-shadow: none;
+    }
+
+    .footer-container {
+        text-align: center;
+    }
+
+    .footer-container p {
+        font-size: 1em;
+    }
+}
