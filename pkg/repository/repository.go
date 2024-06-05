@@ -15,6 +15,7 @@ type Authorization interface {
 type Mail interface {
 	SendCodeActivation(id int, rdmKey string) (string, error)
 	CheckCodeActivation(id int, rdmKey, iconURL string) (bool, error)
+	SendPrivateKey(id int) (string, string, error)
 }
 
 type CryptoAddress interface {
@@ -22,6 +23,7 @@ type CryptoAddress interface {
 	GetEthBalance(id int) (*big.Float, *big.Float, error)
 	GetAddressETC(id int) (string, error)
 	GetIdenIcon(id int) (string, error)
+	GetUserNameById(id int) (string, error)
 	GetAddressGasUsd() (*big.Float, error)
 	CreateTransaction(id int, amount float64, toAddressString string) (string, error)
 }

@@ -10,7 +10,7 @@ import { useRouter } from 'next/router'
 import WalletSearch from '../components/WalletSearch';
 
 const apiKey = "U9ZR3EP6E9VZ2KGXQDM9JP5YDAXP9SB2Z5"
-const pageSize = 10
+const pageSize = 5
 const start = 0
 
 const getStatusClass = (status) => {
@@ -140,7 +140,7 @@ const Transaction = () => {
                         <Link href="home" >Home</Link>
                         <Link href="wallet" >Wallets</Link>
                         <Link href="transaction" className="active">Transactions</Link>
-                        <Link href="security">Security</Link>
+                        <Link href="security">Settings</Link>
                     </div>
                     <div className="search-bar">
                         <WalletSearch />

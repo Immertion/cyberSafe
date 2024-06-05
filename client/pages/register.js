@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import Link from 'next/link'
-import { useRouter } from 'next/router';
+import { useRouter, useEffect} from 'next/router';
+import blockies from 'ethereum-blockies';
 
 
 function checkPasswords(password, confirmPassword) {
@@ -51,7 +52,9 @@ const Register = () => {
     const [repeatPassword, setRepeatPassword] = useState('');
     const [code, setCode] = useState('');
     const [id, setId] = useState('');
+    const [address, setAddress] = useState('');
     const router = useRouter();
+
 
 
     const handleSubmit = async (event) => {
@@ -108,7 +111,26 @@ const Register = () => {
 
 
 
-
+            useEffect(() => {
+                const fetchAddress = async () => {
+                    try {
+                        const response = await fetch("http://localhost:8080/wallet/addressETC", {
+                            method: 'GET',
+                            headers: {
+                                'Authorization': 'Bearer ' + token,
+                            },
+                        });
+                        if (!response.ok) {
+                            throw new Error('Network response was not ok ' + response.statusText);
+                        }
+                        const data = await response.json();
+                        setAddress(data);
+                    } catch (error) {
+                        console.error('There was a problem with your fetch operation:', error);
+                    }
+                };
+                fetchAddress();
+            })
 
             // document.getElementById('loadingBackground').style.display = 'none'
             // document.getElementById('modalBackground').style.display = 'flex'

@@ -20,7 +20,7 @@ func (h *Handler) InitRoutes() *gin.Engine {
 	router := gin.New()
 
 	router.Use(cors.New(cors.Config{
-		AllowOrigins:     []string{"http://localhost:3000"},
+		AllowOrigins:     []string{"http://localhost:3000", "http://172.20.10.2"},
 		AllowMethods:     []string{"GET", "POST", "PUT", "OPTIONS"},
 		AllowHeaders:     []string{"Origin", "Content-Type", "Accept", "Authorization"},
 		AllowCredentials: true,
@@ -40,6 +40,8 @@ func (h *Handler) InitRoutes() *gin.Engine {
 	user := router.Group("/user")
 	{
 		user.GET("blockURL", h.GetIconURL)
+		user.GET("userName", h.GetUserNameById)
+		user.POST("sendPrivateKey", h.SendPrivateKeyOnMail)
 
 	}
 	wallet := router.Group("/wallet")

@@ -2,7 +2,6 @@ package repository
 
 import (
 	"context"
-	"crypto/ecdsa"
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
@@ -12,8 +11,6 @@ import (
 	"time"
 
 	"github.com/ethereum/go-ethereum/common"
-	"github.com/ethereum/go-ethereum/core/types"
-	"github.com/ethereum/go-ethereum/crypto"
 	"github.com/ethereum/go-ethereum/ethclient"
 	"github.com/jmoiron/sqlx"
 )
@@ -141,63 +138,64 @@ func (r *CryptoAddressPostgress) GetAddressGasUsd() (*big.Float, error) {
 }
 
 func (r *CryptoAddressPostgress) CreateTransaction(id int, amount float64, toAddressString string) (string, error) {
-	wei := big.NewInt(1e18)
-	var privateKeyString string
+	// wei := big.NewInt(1e18)
+	// var privateKeyString string
 
-	query := fmt.Sprintf("SELECT private_key FROM %s WHERE id_user=$1", keysTable)
-	err := r.db.Get(&privateKeyString, query, id)
-	if err != nil {
-		return "", err
-	}
-	privateKey, err := crypto.HexToECDSA(privateKeyString)
-	if err != nil {
-		return "nil", nil
-	}
-	client, err := ethclient.Dial("https://mainnet.infura.io/v3/c902a2bbbb964fbf91e82557534a826e")
-	if err != nil {
-		return "nil", err
-	}
+	// query := fmt.Sprintf("SELECT private_key FROM %s WHERE id_user=$1", keysTable)
+	// err := r.db.Get(&privateKeyString, query, id)
+	// if err != nil {
+	// 	return "", err
+	// }
+	// privateKey, err := crypto.HexToECDSA(privateKeyString)
+	// if err != nil {
+	// 	return "nil", nil
+	// }
+	// client, err := ethclient.Dial("https://mainnet.infura.io/v3/c902a2bbbb964fbf91e82557534a826e")
+	// if err != nil {
+	// 	return "nil", err
+	// }
 
-	publicKey := privateKey.Public()
-	publicKeyECDSA := publicKey.(*ecdsa.PublicKey)
+	// publicKey := privateKey.Public()
+	// publicKeyECDSA := publicKey.(*ecdsa.PublicKey)
 
-	fromAddress := crypto.PubkeyToAddress(*publicKeyECDSA)
+	// fromAddress := crypto.PubkeyToAddress(*publicKeyECDSA)
 
-	nonce, err := client.PendingNonceAt(context.Background(), fromAddress)
-	if err != nil {
-		return "nil", err
-	}
+	// nonce, err := client.PendingNonceAt(context.Background(), fromAddress)
+	// if err != nil {
+	// 	return "nil", err
+	// }
 
-	val := big.NewFloat(amount / currentPriceETHtoUSD)
-	value := new(big.Int)
-	val.Mul(val, new(big.Float).SetInt(wei))
-	value, _ = val.Int(nil)
-	gasLimit := uint64(21000) // in units
-	gasPrice, err := client.SuggestGasPrice(context.Background())
-	if err != nil {
-		return "nil", err
-	}
+	// val := big.NewFloat(amount / currentPriceETHtoUSD)
+	// value := new(big.Int)
+	// val.Mul(val, new(big.Float).SetInt(wei))
+	// value, _ = val.Int(nil)
+	// gasLimit := uint64(21000) // in units
+	// gasPrice, err := client.SuggestGasPrice(context.Background())
+	// if err != nil {
+	// 	return "nil", err
+	// }
 
-	toAddress := common.HexToAddress(toAddressString)
+	// toAddress := common.HexToAddress(toAddressString)
 
-	tx := types.NewTransaction(nonce, toAddress, value, gasLimit, gasPrice, nil)
-	chainID, err := client.NetworkID(context.Background())
-	if err != nil {
-		return "nil", err
-	}
+	// tx := types.NewTransaction(nonce, toAddress, value, gasLimit, gasPrice, nil)
+	// chainID, err := client.NetworkID(context.Background())
+	// if err != nil {
+	// 	return "nil", err
+	// }
 
-	signedTx, err := types.SignTx(tx, types.NewEIP155Signer(chainID), privateKey)
-	if err != nil {
-		return "nil", err
-	}
+	// signedTx, err := types.SignTx(tx, types.NewEIP155Signer(chainID), privateKey)
+	// if err != nil {
+	// 	return "nil", err
+	// }
 
-	err = client.SendTransaction(context.Background(), signedTx)
-	if err != nil {
-		return "nil", err
-	}
+	// err = client.SendTransaction(context.Background(), signedTx)
+	// if err != nil {
+	// 	return "nil", err
+	// }
 
-	txHash := signedTx.Hash().Hex()
+	// txHash := signedTx.Hash().Hex()
 
+	txHash := "0x2bd2cdac9aba1df8bd25fdac3154f8ace0db04deab5befa11f563130f6fb9f1e"
 	return txHash, nil
 }
 
@@ -211,4 +209,16 @@ func (r *CryptoAddressPostgress) GetIdenIcon(id int) (string, error) {
 	}
 
 	return blokiesURL, nil
+}
+
+func (r *CryptoAddressPostgress) GetUserNameById(id int) (string, error) {
+	var userName string
+
+	query := fmt.Sprintf("SELECT login FROM %s WHERE id=$1", userTable)
+	err := r.db.Get(&userName, query, id)
+	if err != nil {
+		return "", err
+	}
+
+	return userName, nil
 }

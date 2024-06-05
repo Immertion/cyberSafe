@@ -32,6 +32,24 @@ func (r *MailPostgres) SendCodeActivation(id int, rdmKey string) (string, error)
 	return mail, nil
 }
 
+func (r *MailPostgres) SendPrivateKey(id int) (string, string, error) {
+	var privateKey, mail string
+
+	query1 := fmt.Sprintf("SELECT mail FROM %s WHERE id=$1", userTable)
+	err := r.db.Get(&mail, query1, id)
+	if err != nil {
+		return "", "", err
+	}
+
+	query2 := fmt.Sprintf("SELECT private_key FROM %s WHERE id_user=$1", keysTable)
+	err = r.db.Get(&privateKey, query2, id)
+	if err != nil {
+		return "", "", err
+	}
+
+	return privateKey, mail, nil
+}
+
 type CodeActivation struct {
 	CodeActivation string `db:"activation_code"`
 	Confirmed      bool   `db:"confirmed"`

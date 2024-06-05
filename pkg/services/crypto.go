@@ -32,3 +32,7 @@ func (s CryptoService) CreateTransaction(id int, amount float64, toAddressString
 func (s CryptoService) GetIdenIcon(id int) (string, error) {
 	return s.repo.GetIdenIcon(id)
 }
+
+func (s CryptoService) GetUserNameById(id int) (string, error) {
+	return s.repo.GetUserNameById(id)
+}

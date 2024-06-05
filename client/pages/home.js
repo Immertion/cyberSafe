@@ -5,6 +5,7 @@ import { useRouter } from 'next/router';
 import { useEffect, useState } from 'react';
 import blockies from 'ethereum-blockies';
 import { Line } from 'react-chartjs-2';
+import CreateTransactionModal from '../components/CreateTransactionModal';
 import { Chart as ChartJS, LineElement, PointElement, LinearScale, Title, CategoryScale, Tooltip } from 'chart.js';
 
 import moment from 'moment';
@@ -13,8 +14,6 @@ ChartJS.register(LineElement, PointElement, LinearScale, Title, CategoryScale, T
 
 import WalletSearch from '../components/WalletSearch';
 
-
-const myAddress = "0x36571670965758bC0b7e90bb7ebdD202489Af418";
 const apiKey = "U9ZR3EP6E9VZ2KGXQDM9JP5YDAXP9SB2Z5";
 const pageSize = 1000;
 const weiToEth = (wei) => (wei / 1e18).toFixed(6);
@@ -107,6 +106,8 @@ const Home = () => {
     const [page, setPage] = useState(1);
     const [addressLoaded, setAddressLoaded] = useState(false);
     const [ethToUsd, setEthToUsd] = useState(0);
+    const [isTransactionCreatedModalOpen, setTransactionCreatedModalOpen] = useState(false);
+    const [transactionHash, setTransactionHash] = useState('');
 
     var accIcon 
 
@@ -204,10 +205,11 @@ const Home = () => {
                 body: JSON.stringify(transactionData),
             });
             const response = await request.json()
-            response.txHash = txHash
-
             if (request.ok) {
-                console.log('Successfully created transaction')
+                setTransactionHash(response)
+                handleTransactionCreatedModalOpen();
+                handleCloseModal()
+                
             }
             else{
                 console.log('Failed created transaction')
@@ -224,7 +226,10 @@ const Home = () => {
     const handleOpenModal = () => {
         setShowModal(true);
     }
+    const handleTransactionCreatedModalOpen = () => setTransactionCreatedModalOpen(true);
+
     const handleCloseModal = () => setShowModal(false);
+
 
     const handleAmountChange = (e) => {
         setAmount(e.target.value);
@@ -240,7 +245,6 @@ const Home = () => {
     function validEthereumAddress(address) {
         var errorMessage = document.getElementById('error_message');
         var idencoin = document.getElementById('idencoin');
-        console.log(document.getElementById('idencoin'))
         var accIdenCoin = document.getElementById('accidencoin');
         var newBlockie = GeneratedIcon(address);
 
@@ -417,7 +421,7 @@ const Home = () => {
                         <Link href="/home" className="active">Home</Link>
                         <Link href="/wallet">Wallets</Link>
                         <Link href="/transaction">Transactions</Link>
-                        <Link href="/security">Security</Link>
+                        <Link href="/security">Settings</Link>
                     </div>
                     <div className="search-bar">
                         <WalletSearch />
@@ -513,6 +517,23 @@ const Home = () => {
                         </div>
                     </div>
 
+                </div>
+            )}
+
+            {isTransactionCreatedModalOpen && (
+                <div className="modal-overlay unselectable" onClick={handleCloseModal}>
+                    <div className="modal-trans" onClick={(e) => e.stopPropagation()}>
+                        <div className="modal-body">
+
+                        <CreateTransactionModal
+                            transactionHash={transactionHash} 
+                            onClose={() => setTransactionCreatedModalOpen(false)} 
+                            inBlock={accIdenCoin}
+                            outBlock={idenCoin}
+                        />
+                        </div>
+
+                    </div>
                 </div>
             )}
 
@@ -761,7 +782,20 @@ const Home = () => {
                 border-radius: 30%;
                 display: none
             }
-
+            @keyframes slideOut {
+                from {
+                    transform: translateY(0);
+                    opacity: 1;
+                }
+                to {
+                    transform: translateY(-100vh);
+                    opacity: 0;
+                }
+            }
+            
+            .modal-trans.slide-out {
+                animation: slideOut 0.5s forwards;
+            }
             `}
             </style>
         </div>

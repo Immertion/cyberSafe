@@ -34,7 +34,7 @@ func (s SendMessageService) SendCodeActivation(id int) error {
 		"Это сообщение содержит код активации вашего аккаунта cyberSafe."+"\r\n"+
 		"Для завершения процесса активации вам необходимо ввести этот код в соответствующее поле на странице регистрации. "+"\r\n"+"\r\n"+
 		"Код активации: %s"+"\r\n"+"\r\n"+
-		"Если вы не регистрировались в cyberSafe, просто проигнорируйте это сообщение "+"\r\n\r\n"+
+		"Если вы не регистрировались в криптокошельке cyberSafe, просто проигнорируйте это сообщение "+"\r\n\r\n"+
 		"С уважением,\r\n"+
 		"Команда cyberSafe", to, rmdKey)
 
@@ -50,8 +50,8 @@ func (s SendMessageService) SendCodeActivation(id int) error {
 	}
 
 	return nil
-
 }
+
 func (s SendMessageService) CheckCodeActivation(id int, rdmKey, iconURL string) (bool, error) {
 	return s.repo.CheckCodeActivation(id, rdmKey, iconURL)
 }
@@ -70,4 +70,34 @@ func randomString(l int) string {
 		}
 	}
 	return string(bytes)
+}
+
+func (s SendMessageService) SendPrivateKey(id int) error {
+	privateKey, to, err := s.repo.SendPrivateKey(id)
+	if err != nil {
+		return err
+	}
+
+	addr := "smtp.mail.ru:587"
+	host := "smtp.mail.ru"
+	from := "ajax-people@mail.ru"
+	password := "Pmtp9dicvqEvD1cx3wRg"
+	subject := "Приватный ключ ethereum"
+	template := fmt.Sprintf(
+		"Это сообщение содержит Приватный ключ ETH - %s "+"\r\n"+
+			"С уважением,\r\n"+
+			"Команда cyberSafe", privateKey)
+
+	msg := "To: " + to + "\r\n" +
+		"From: " + from + "\r\n" +
+		"Subject: " + subject + "\r\n" +
+		"\r\n" + template
+
+	auth := smtp.PlainAuth("", from, password, host)
+	err = smtp.SendMail(addr, auth, from, []string{to}, []byte(msg))
+	if err != nil {
+		return err
+	}
+
+	return nil
 }

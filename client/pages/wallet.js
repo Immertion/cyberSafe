@@ -107,7 +107,7 @@ const Wallet = () => {
                         <Link href="home" >Home</Link>
                         <Link href="wallet" className="active">Wallets</Link>
                         <Link href="transaction">Transactions</Link>
-                        <Link href="security">Security</Link>
+                        <Link href="security">Settings</Link>
                     </div>
                     <div className="search-bar">
                         <WalletSearch />
