@@ -136,16 +136,13 @@ export default function TransactionCreatedModal({ transactionHash, onClose, inBl
                     border-radius: 50%;
                     position: absolute;
                     left: 0;
-                    animation: moveCoin 3s infinite ease-in-out;
+                    animation: moveCoin 3s ease-in-out forwards infinite;
                     z-index: 1;
                 }
 
                 @keyframes moveCoin {
                     0% { transform: translateX(0); }
-                    45% { transform: translateX(220px); }
-                    50% { transform: translateX(220px); }
-                    95% { transform: translateX(0); }
-                    100% { transform: translateX(0); }
+                    100% { transform: translateX(220px); }
                 }
             `}</style>
         </div>

@@ -24,6 +24,7 @@ type GenerateKeys interface {
 
 type Crypto interface {
 	GetBalanceETC(id int) (*big.Float, *big.Float, error)
+	GetBalanceUSDT(id int) (*big.Float, error)
 	GetAddressETC(id int) (string, error)
 	GetAddressGasUsd() (*big.Float, error)
 	GetIdenIcon(id int) (string, error)

@@ -71,7 +71,7 @@ const Auth = () => {
         };
 
         try {
-            const request = await fetch('http://localhost:8080/sign-in', {
+            const request = await fetch(process.env.NEXT_PUBLIC_PROD_VERSION + "sign-in", {
                 method: 'POST',
    
                 headers: {

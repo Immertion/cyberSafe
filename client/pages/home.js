@@ -9,12 +9,14 @@ import CreateTransactionModal from '../components/CreateTransactionModal';
 import { Chart as ChartJS, LineElement, PointElement, LinearScale, Title, CategoryScale, Tooltip } from 'chart.js';
 
 import moment from 'moment';
-
 ChartJS.register(LineElement, PointElement, LinearScale, Title, CategoryScale, Tooltip);
 
-import WalletSearch from '../components/WalletSearch';
+import Navbar from '../components/Navbar';
+import SupportButton from '../components/SupportButton';
+import ScheduledPayment from '../components/ScheduledPayment';
 
-const apiKey = "U9ZR3EP6E9VZ2KGXQDM9JP5YDAXP9SB2Z5";
+
+const apiKey = process.env.NEXT_PUBLIC_API_KEY_ETHERSCAN;
 const pageSize = 1000;
 const weiToEth = (wei) => (wei / 1e18).toFixed(6);
 
@@ -108,7 +110,9 @@ const Home = () => {
     const [ethToUsd, setEthToUsd] = useState(0);
     const [isTransactionCreatedModalOpen, setTransactionCreatedModalOpen] = useState(false);
     const [transactionHash, setTransactionHash] = useState('');
-
+    const [showScheduledPayment, setShowScheduledPayment] = useState(false);
+    const [isScheduled, setIsScheduled] = useState(false);
+    
     var accIcon 
 
     useEffect(() => {
@@ -144,7 +148,7 @@ const Home = () => {
     useEffect(() => {
         const fetchAddress = async () => {
             try {
-                const response = await fetch("http://localhost:8080/wallet/addressETC", {
+                const response = await fetch(process.env.NEXT_PUBLIC_PROD_VERSION + "wallet/addressETC", {
                     method: 'GET',
                     headers: {
                         'Authorization': 'Bearer ' + token,
@@ -164,7 +168,7 @@ const Home = () => {
     })
 
     useEffect(() => {
-        fetch("http://localhost:8080/user/blockURL", {
+        fetch(process.env.NEXT_PUBLIC_PROD_VERSION + "user/blockURL", {
             method: 'GET',
             headers: {
                 'Authorization': 'Bearer ' + token,
@@ -195,7 +199,7 @@ const Home = () => {
         };
         
         try {
-            const request = await fetch('http://localhost:8080/wallet/sendETH', {
+            const request = await fetch(process.env.NEXT_PUBLIC_PROD_VERSION + "wallet/sendETH", {
                 method: 'POST',
    
                 headers: {
@@ -269,7 +273,11 @@ const Home = () => {
         }
     }
 
-
+    const handleSchedule = (date, time) => {
+        console.log('Запланированный платеж на', date, time);
+        setIsScheduled(true);
+      };
+      
     const fetchEthToUsd = async () => {
         try {
             const res = await fetch('https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&ids=ethereum&YOUR_API_KEY=CG-ZGGmfKAQj2FCLiRRkhhLRtna');
@@ -412,22 +420,9 @@ const Home = () => {
 
     return (
         <div className="body">
-            <header>
-                <div className="navbar unselectable">
-                    <div className="logo">
-                        CryptoSafe
-                    </div>
-                    <div className="nav-links">
-                        <Link href="/home" className="active">Home</Link>
-                        <Link href="/wallet">Wallets</Link>
-                        <Link href="/transaction">Transactions</Link>
-                        <Link href="/security">Settings</Link>
-                    </div>
-                    <div className="search-bar">
-                        <WalletSearch />
-                    </div>
-                </div>
-            </header>
+            <Navbar
+                activeWindow="home"
+            />
 
             <div className="container_home unselectable">
                 <div className="split-container">
@@ -493,6 +488,7 @@ const Home = () => {
                                     min="0.1" max={balance}
                                     step="0.01" 
                                     required/>
+         
                                 <GasFeeDisplay amount={amount} />
                                 <label htmlFor="to-wallet">Send to the address:</label>
                                 <input type="text"
@@ -505,18 +501,36 @@ const Home = () => {
                                 
                                     <img id="accidencoin" src={accIdenCoin} className="idencoin" /> 
                                     <img id="idencoin" src={idenCoin} className="idencoin" />
+
                                     
                                     <div id="error_message">Incorrect address</div>
-
+                                    <div className="actions">
+                                        <label className="checkbox-container">
+                                            Scheduled payment     
+                                            <input
+                                            type="checkbox"
+                                            checked={isScheduled}
+                                            onClick={() => setShowScheduledPayment(true)}
+                                            />
+                                            
+                                            <span className="checkmark"></span>
+                                            
+                                        </label>
+                                    </div>
                                 <button type="submit" className="button-trans">Send</button>
                             </form>
-                            {/* <span className="crypto-animation"></span> */}
-
+                           
                             <br></br>
                             <button type="button" className="button-trans" onClick={handleCloseModal}>Close</button>
                         </div>
+                        {showScheduledPayment && (
+                            <ScheduledPayment
+                            onClose={() => setShowScheduledPayment(false)}
+                            onSchedule={handleSchedule}
+                            />
+      )}
                     </div>
-
+                    
                 </div>
             )}
 
@@ -524,6 +538,7 @@ const Home = () => {
                 <div className="modal-overlay unselectable" onClick={handleCloseModal}>
                     <div className="modal-trans" onClick={(e) => e.stopPropagation()}>
                         <div className="modal-body">
+
 
                         <CreateTransactionModal
                             transactionHash={transactionHash} 
@@ -540,6 +555,7 @@ const Home = () => {
             <footer>
                 <div className="footer-container ">
                     <p>CryptoSafe</p>
+                    <SupportButton/>
                 </div>
             </footer>
             <style jsx>
@@ -563,6 +579,62 @@ const Home = () => {
                 margin-left: 10%;
                 margin-top: 5%;
                 
+            }
+
+            checkbox-container {
+                display: block;
+                position: relative;
+                padding-left: 35px;
+                cursor: pointer;
+                font-size: 22px;
+                user-select: none;
+              }
+      
+              .checkbox-container input {
+                position: absolute;
+                opacity: 0;
+                cursor: pointer;
+                height: 0;
+                width: 0;
+              }
+      
+              .checkmark {
+                position: absolute;
+                height: 25px;
+                width: 25px;
+                background-color: #eee;
+                margin-left: 2%;
+              }
+      
+              .checkbox-container input:checked ~ .checkmark {
+                background-color: #6200ea;
+              }
+      
+              .checkmark:after {
+                content: "";
+                position: absolute;
+                display: none;
+              }
+      
+              .checkbox-container input:checked ~ .checkmark:after {
+                display: block;
+              }
+      
+              .checkbox-container .checkmark:after {
+                left: 9px;
+                top: 5px;
+                width: 5px;
+                height: 10px;
+                border: solid white;
+                border-width: 0 3px 3px 0;
+                transform: rotate(45deg);
+              }
+      
+              .checkmark-button:hover {
+                background: #3700b3;
+              }
+            .actions{
+                margin-bottom: 20px
             }
             .loading-text {
                 position: absolute;
@@ -796,6 +868,160 @@ const Home = () => {
             .modal-trans.slide-out {
                 animation: slideOut 0.5s forwards;
             }
+
+            @media (max-width: 1200px) {
+                .container_home {
+                    max-width: 90%;
+                    padding: 1.5em;
+                }
+            
+                .balance-card {
+                    padding: 15px 30px;
+                }
+            
+                .modal-trans {
+                    max-width: 350px;
+                }
+            }
+            
+            @media (max-width: 1024px) {
+                .container_home {
+                    max-width: 90%;
+                    padding: 1.5em;
+                }
+            
+                .balance-card {
+                    padding: 15px 30px;
+                }
+            
+                .modal-trans {
+                    max-width: 350px;
+                }
+            
+                .loading-text {
+                    font-size: 35px;
+                }
+            
+                .spinner {
+                    margin-left: 8%;
+                    margin-top: 4%;
+                }
+            }
+            
+            @media (max-width: 768px) {
+                .container_home {
+                    max-width: 100%;
+                    padding: 1em;
+                }
+            
+                .balance-container {
+                    flex-direction: column;
+                    align-items: stretch;
+                }
+            
+                .balance-card {
+                    padding: 10px 20px;
+                    margin-bottom: 1em; /* Добавить отступ между карточками */
+                }
+            
+                .loading-text {
+                    font-size: 30px;
+                }
+            
+                .spinner {
+                    margin-left: 5%;
+                    margin-top: 3%;
+                }
+            
+                .modal-trans {
+                    max-width: 300px;
+                    padding: 1em;
+                }
+            
+                .crypto-animation {
+                    width: 15px;
+                    height: 15px;
+                    top: 30px;
+                    left: 30px;
+                }
+            }
+            
+            @media (max-width: 480px) {
+                .container_home {
+                    max-width: 100%;
+                    padding: 0.5em;
+                }
+            
+                .balance-container {
+                    flex-direction: column;
+                    align-items: stretch;
+                }
+            
+                .balance-card {
+                    padding: 10px 15px;
+                    margin-bottom: 1em; /* Добавить отступ между карточками */
+                }
+            
+                .loading-text {
+                    font-size: 25px;
+                }
+            
+                .spinner {
+                    margin-left: 5%;
+                    margin-top: 2%;
+                }
+            
+                .modal-trans {
+                    max-width: 280px;
+                    padding: 0.5em;
+                }
+            
+                .crypto-animation {
+                    width: 10px;
+                    height: 10px;
+                    top: 20px;
+                    left: 20px;
+                }
+            }
+            
+            @media (max-width: 360px) {
+                .container_home {
+                    max-width: 100%;
+                    padding: 0.5em;
+                }
+            
+                .balance-container {
+                    flex-direction: column;
+                    align-items: stretch;
+                }
+            
+                .balance-card {
+                    padding: 5px 10px;
+                    margin-bottom: 1em; /* Добавить отступ между карточками */
+                }
+            
+                .loading-text {
+                    font-size: 20px;
+                }
+            
+                .spinner {
+                    margin-left: 3%;
+                    margin-top: 1%;
+                }
+            
+                .modal-trans {
+                    max-width: 250px;
+                    padding: 0.5em;
+                }
+            
+                .crypto-animation {
+                    width: 8px;
+                    height: 8px;
+                    top: 15px;
+                    left: 15px;
+                }
+            }
+            
             `}
             </style>
         </div>

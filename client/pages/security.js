@@ -1,31 +1,19 @@
-import Link from 'next/link'
-import WalletSearch from '../components/WalletSearch';
+import Navbar from '../components/Navbar';
 import PersonalArea from '../components/PersonalArea';
+import SupportButton from '../components/SupportButton';
 
 const Security = () => {
 
     return ( 
         <div className="body">
-            <header>
-                <div className="navbar">
-                    <div className="logo ">
-                        CryptoSafe
-                        </div>
-                    <div className="nav-links">
-                        <Link href="home" >Home</Link>
-                        <Link href="wallet" >Wallets</Link>
-                        <Link href="transaction">Transactions</Link>
-                        <Link href="security" className="active">Settings</Link>
-                    </div>
-                    <div className="search-bar">
-                        <WalletSearch />
-                    </div>
-                </div>
-            </header>
+            <Navbar
+                activeWindow="security"
+            />
             <PersonalArea />
             <footer>
                 <div className="footer-container">
                     <p>CryptoSafe</p>
+                    <SupportButton/>
                 </div>
             </footer>
         <style jsx>

@@ -4,6 +4,14 @@
     box-sizing: border-box;
 }
 
+html {
+    height: 100%;
+    margin: 0;
+    padding: 0;
+    overflow-x: hidden; /* Отключить горизонтальную прокрутку */
+    background-color: #333; /* Установите фоновый цвет для всего документа */
+}
+
 .body {
     font-family: 'Arial', sans-serif;
     background-color: #333; /* Dark background for better contrast */
@@ -11,8 +19,27 @@
     height: 100vh;
     display: flex;
     justify-content: center;
+    overflow-x: hidden; /* Отключить горизонтальную прокрутку */
+
     align-items: center;
-    padding: 1em; /* Added padding for overall spacing */
+    padding-top: 1em; /* Added padding for overall spacing */
+}
+
+
+
+
+.container_home {
+    text-align: center;
+    border-radius: 10px;
+    background: #222;
+    padding: 2em;
+    max-width: 1200px;
+    width: 100%;
+    box-shadow: 0 0 10px #BB86FC, 0 0 30px #BB86FC, 0 0 60px #BB86FC;
+}
+
+.container_home {
+    margin-top: 20px; /* Дополнительный отступ для контейнера */
 }
 
 .container {
@@ -22,19 +49,20 @@
     padding: 2em;
     max-width: 700px;
     width: 100%;
-    box-shadow: 0 0 10px #BB86FC, 0 0 30px #BB86FC, 0 0 60px #BB86FC;   
-
-
+    box-shadow: 0 0 10px #BB86FC, 0 0 30px #BB86FC, 0 0 60px #BB86FC;
 }
+
 .title {
     color: #7B2EFF;
     font-size: 2em;
     margin-bottom: 0.5em;
 }
+
 .description {
     margin-bottom: 2em;
     color: #AAA;
 }
+
 .start-btn {
     background-color: #7B2EFF;
     border: none;
@@ -45,6 +73,7 @@
     cursor: pointer;
     transition: background-color 0.3s ease;
 }
+
 .start-btn:hover {
     background-color: #9A4EFF;
 }
@@ -71,7 +100,6 @@
     max-width: 1200px; /* Adjust as per your design preference */
 }
 
-
 /* Style for decorative graphics on the right pane, potentially SVG or complex CSS shapes */
 .graphic {
     position: absolute;
@@ -87,13 +115,17 @@
     height: auto;
 }
 
-#error_message{
+#error_message {
     color: rgb(247, 94, 94); 
     display: none;
 }
 
-#error_message_code{
+#error_message_code {
     color: rgb(247, 94, 94); 
+    display: none;
+}
+.menu-icon{
+    margin-left: 2em;
     display: none;
 }
 
@@ -109,10 +141,10 @@
     z-index: 2000; /* Повыше других элементов */
     justify-content: center;
     align-items: center;
-  }
-  
-  /* Стили для спиннера */
-  .spinner {
+}
+
+/* Стили для спиннера */
+.spinner {
     border: 4px solid rgba(255, 255, 255, 0.3);
     border-radius: 50%;
     border-top: 4px solid #fff;
@@ -120,51 +152,46 @@
     height: 50px;
     -webkit-animation: spin 1s linear infinite; /* Анимация для Chrome, Safari, Opera */
     animation: spin 1s linear infinite; /* Стандартная анимация */
-  }
+}
 
-  /* Анимация вращения */
-  @-webkit-keyframes spin {
+/* Анимация вращения */
+@-webkit-keyframes spin {
     0% { -webkit-transform: rotate(0deg); }
     100% { -webkit-transform: rotate(360deg); }
-  }
-  
-  @keyframes spin {
+}
+
+@keyframes spin {
     0% { transform: rotate(0deg); }
     100% { transform: rotate(360deg); }
-  }
-  
-
-
-  /* Стили для уведомления */
-
-  .Image{
-    margin-right: 5px
 }
-  .navbar {
+
+/* Стили для уведомления */
+.Image {
+    margin-right: 5px;
+}
+
+.navbar {
     display: flex;
     justify-content: space-between;
     align-items: center;
     padding: 0.5em 2em;
-    background-color: #222; /* Match the color from your image */
+    background-color: #222;
     color: white;
-    position: fixed; /* This makes the navbar stay at the top */
-    top: 0; /* Position at the very top */
-    left: 0; /* Align to the left */
-    right: 0; /* Align to the right */
-    z-index: 1000; /* Ensures navbar is above other content */
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 1000;
+    height: 60px; /* Задайте высоту навигационной панели */
 }
+
 
 .navbar .logo {
     margin-right: auto; /* Pushes all other navbar items to the right */
 }
 
-.logo{
+.logo {
     font-size: 1.5em;
-}
-
-.navbar .nav-links {
-    display: flex; /* Aligns links in a row */
-    list-style-type: none; /* Removes list styling */
 }
 
 .navbar .nav-links a {
@@ -185,14 +212,13 @@
     border-radius: 5px; /* Rounded corners for the background */
     transition: background-color 0.3s ease, color 0.3s ease; /* Smooth transition for background and text color */
 }
+
 .navbar .nav-links a:hover {
     background-color: rgba(123, 46, 255, 0.3); /* Semi-transparent background on hover */
     color: white; /* Change text color on hover for better contrast */
-
 }
 
 .navbar .search-bar {
-    display: flex;
     align-items: center;
     margin-left: auto; /* Pushes the search bar to the right */
 }
@@ -215,13 +241,8 @@
 }
 
 
-  .wallets {
-    display: flex;
-    justify-content: space-between;
-    padding: 20px;
-  }
-  
-  .start-btn {
+
+.start-btn {
     background-color: #7B2EFF;
     color: white;
     padding: 0.75em 1.5em;
@@ -236,20 +257,32 @@
 .start-btn:hover {
     background-color: #9A4EFF;
 }
-  .chart {
+
+.wallets {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    background: #121212;
+    padding: 20px;
+}
+
+
+.chart {
     height: 250px;
     width: 100%;
     /* A placeholder for the chart */
     background: repeating-linear-gradient(
-      to right,
-      #333,
-      #333 10px,
-      #444 10px,
-      #444 11px
+        to right,
+        #333,
+        #333 10px,
+        #444 10px,
+        #444 11px
     );
-  }
-  
-  footer {
+}
+
+footer {
     width: 100%;
     padding: 1em 2em;
     background-color: #222; /* Match the footer background to your design */
@@ -264,19 +297,20 @@
     margin: 0;
     font-size: 0.8em;
 }
-.left-pane{
+
+.left-pane {
     background: #1A1A1A; /* Slightly lighter background for contrast */
     padding: 2em;
     border-radius: 10px; /* Smoothed the corners */
     margin-right: 1em; /* Added space between the columns */
 }
+
 .right-pane {
     background: #1A1A1A; /* Slightly lighter background for contrast */
     padding: 2em;
     border-radius: 10px; /* Smoothed the corners */
     margin-right: 1em; /* Added space between the columns */
     width: 100%;
-    
 }
 
 .balance {
@@ -291,33 +325,160 @@
     font-size: 1.5em; /* Larger font size for balance amount */
     font-weight: bold; /* Bold font for emphasis */
 }
-  
+
 .unselectable {
-  -moz-user-select: none;
-  -khtml-user-select: none;
-  -webkit-user-select: none;
-  user-select: none;
-} 
+    -moz-user-select: none;
+    -khtml-user-select: none;
+    -webkit-user-select: none;
+    user-select: none;
+}
+
+/* Адаптивность для всех стилей */
+@media (max-width: 1200px) {
+    .split-container {
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .left-pane, .right-pane {
+        width: 100%;
+        margin-bottom: 1em;
+        margin-right: 0; /* Remove right margin for single-column layout */
+    }
+
+    .right-pane {
+        margin-bottom: 0;
+    }
+
+    .graphic {
+        width: 100%;
+    }
+}
+
+@media (max-width: 1024px) {
+    body {
+        padding-top: calc(60px + 1em); /* 60px высота панели + 1em дополнительный отступ */
+    }
+    .split-container {
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .left-pane, .right-pane {
+        width: 100%;
+        margin-bottom: 1em;
+        margin-right: 0; /* Remove right margin for single-column layout */
+    }
+
+    .right-pane {
+        margin-bottom: 0;
+    }
+
+    .graphic {
+        width: 90%;
+    }
+}
 
 @media (max-width: 768px) {
+    body {
+        padding-top: calc(60px + 1em); /* 60px высота панели + 1em дополнительный отступ */
+    }
     .navbar {
+        flex-direction: column;
+        width: 100%;
+        background-color: #222;
+        position: absolute;
+        left: 0;
+    }
+    
+
+    .menu-icon {
+        display: block; /* Показать иконку меню */
+    }
+
+    .nav-links {
+        display: none; /* Скрываем ссылки по умолчанию */
+        flex-direction: column;
+        width: 100%;
+        background-color: #222;
+        position: absolute;
+        top: 50px; /* Ниже навбара */
+        left: 0;
+    }
+
+    .show-nav-links {
+        display: flex; /* Показываем ссылки, когда меню открыто */
+    }
+
+    .nav-links a {
         padding: 1em;
+        text-align: center;
+        width: 100%;
+    }
+
+ 
+
+    .container_home {
+        padding: 1em;
+    }
+
+    .split-container {
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .left-pane, .right-pane {
+        width: 100%;
+        margin: 0;
+    }
+
+    .search-bar{
+        display: none;
+    }
+
+    .container {
+        padding: 1em;
+        box-shadow: none;
+    }
+
+    .footer-container {
+        text-align: center;
+    }
+
+    .footer-container p {
+        font-size: 1em;
+    }
+
+    .graphic {
+        width: 100%;
+    }
+}
+
+@media (max-width: 480px) {
+    body {
+        padding-top: calc(60px + 1em); /* 60px высота панели + 1em дополнительный отступ */
+    }
+    .navbar {
+        flex-direction: column;
+        align-items: center;
+        padding: 0.5em;
     }
 
     .navbar .nav-links {
         flex-direction: column;
         width: 100%;
+        margin-top: 0.5em;
     }
 
     .navbar .nav-links a {
         width: 100%;
-        padding: 1em;
+        padding: 0.5em;
         text-align: center;
     }
 
     .navbar .search-bar {
         width: 100%;
-        margin-top: 1em;
+        margin-top: 0.5em;
     }
 
     .navbar .search-bar input[type="search"] {
@@ -339,7 +500,7 @@
     }
 
     .container {
-        padding: 1em;
+        padding: 0.5em;
         box-shadow: none;
     }
 
@@ -348,6 +509,14 @@
     }
 
     .footer-container p {
-        font-size: 1em;
+        font-size: 0.8em;
+    }
+
+    .graphic {
+        width: 90%;
     }
 }
+
+
+
+

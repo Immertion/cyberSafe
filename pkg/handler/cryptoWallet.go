@@ -58,6 +58,25 @@ func (h *Handler) GetAddressETCById(c *gin.Context) {
 	c.JSON(http.StatusOK, address)
 }
 
+func (h *Handler) GetUSDTBalanceById(c *gin.Context) {
+	authHeader := c.GetHeader("Authorization")
+	token := strings.TrimPrefix(authHeader, "Bearer ")
+
+	userId, _, err := parseJWT(h, token)
+	if err != nil {
+		newErrorResponse(c, http.StatusBadRequest, err.Error())
+		return
+	}
+
+	balanceUSDT, err := h.services.GetBalanceUSDT(userId)
+	if err != nil {
+		newErrorResponse(c, http.StatusInternalServerError, err.Error())
+		return
+	}
+
+	c.JSON(http.StatusOK, balanceUSDT)
+}
+
 func (h *Handler) GetGasPrice(c *gin.Context) {
 
 	gasPrice, err := h.services.GetAddressGasUsd()

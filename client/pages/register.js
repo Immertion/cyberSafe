@@ -72,7 +72,7 @@ const Register = () => {
             document.getElementById('loadingBackground').style.display = 'flex'
     
             try {
-                const request = await fetch('http://localhost:8080/sign-up', {
+                const request = await fetch(process.env.NEXT_PUBLIC_PROD_VERSION + "sign-up", {
                     method: 'POST',
        
                     headers: {
@@ -109,32 +109,6 @@ const Register = () => {
             }
             };
 
-
-
-            useEffect(() => {
-                const fetchAddress = async () => {
-                    try {
-                        const response = await fetch("http://localhost:8080/wallet/addressETC", {
-                            method: 'GET',
-                            headers: {
-                                'Authorization': 'Bearer ' + token,
-                            },
-                        });
-                        if (!response.ok) {
-                            throw new Error('Network response was not ok ' + response.statusText);
-                        }
-                        const data = await response.json();
-                        setAddress(data);
-                    } catch (error) {
-                        console.error('There was a problem with your fetch operation:', error);
-                    }
-                };
-                fetchAddress();
-            })
-
-            // document.getElementById('loadingBackground').style.display = 'none'
-            // document.getElementById('modalBackground').style.display = 'flex'
-
         }
 
         const codeSumbit = async (event) => {
@@ -152,7 +126,7 @@ const Register = () => {
             };
 
                 try {
-                    const request = await fetch('http://localhost:8080/activation/check/' + id, {
+                    const request = await fetch(process.env.NEXT_PUBLIC_PROD_VERSION + "activation/check/" + id, {
                         method: 'PUT',
            
                         headers: {

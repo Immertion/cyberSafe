@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import axios from 'axios';
 
 
-const apiKey = "U9ZR3EP6E9VZ2KGXQDM9JP5YDAXP9SB2Z5"
+const apiKey = process.env.NEXT_PUBLIC_API_KEY_ETHERSCAN
 
 const WalletSearch = () => {
     const [input, setInput] = useState('');
@@ -19,29 +19,13 @@ const WalletSearch = () => {
             const isTxHash = /^0x([A-Fa-f0-9]{64})$/.test(input);
 
             if (isAddress) {
-                try {
-                    const response = await axios.get(`https://api.etherscan.io/api?module=account&action=balance&address=${input}&tag=latest&apikey=${apiKey}`);
-                    if (response.data.result) {
-                        const etherscanUrl = `https://etherscan.io/address/${input}`;
-                        window.open(etherscanUrl, '_blank');
-                    } else {
-                        setError('Invalid wallet address.');
-                    }
-                } catch (error) {
-                    setError('Error validating wallet address.');
-                }
+
+                const url = process.env.NEXT_PUBLIC_TRANSACTION_HOST + `searchPage?type=address&id=${input}`;
+                window.open(url, '_blank');
             } else if (isTxHash) {
-                try {
-                    const response = await axios.get(`https://api.etherscan.io/api?module=transaction&action=gettxreceiptstatus&txhash=${input}&apikey=${apiKey}`);
-                    if (response.data.result) {
-                        const etherscanUrl = `https://etherscan.io/tx/${input}`;
-                        window.open(etherscanUrl, '_blank');
-                    } else {
-                        setError('Invalid transaction hash.');
-                    }
-                } catch (error) {
-                    setError('Error validating transaction hash.');
-                }
+                const url = process.env.NEXT_PUBLIC_TRANSACTION_HOST + `searchPage?type=transaction&id=${input}`;
+                window.open(url, '_blank');
+                  
             } else {
                 setError('Please enter a valid wallet address or transaction hash.');
             }

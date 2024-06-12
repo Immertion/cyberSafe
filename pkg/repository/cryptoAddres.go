@@ -8,8 +8,11 @@ import (
 	"math"
 	"math/big"
 	"net/http"
+	"strings"
 	"time"
 
+	"github.com/ethereum/go-ethereum"
+	"github.com/ethereum/go-ethereum/accounts/abi"
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/ethclient"
 	"github.com/jmoiron/sqlx"
@@ -26,6 +29,12 @@ func NewCryptoAddress(db *sqlx.DB) *CryptoAddressPostgress {
 type Response struct {
 	CurrentPrice float64 `json:"current_price"`
 }
+
+const (
+	tokenUSDT = "0xdAC17F958D2ee523a2206206994597C13D831ec7"
+	erc20ABI  = `[{"constant":true,"inputs":[{"name":"_owner","type":"address"}],"name":"balanceOf","outputs":[{"name":"balance","type":"uint256"}],"payable":false,"stateMutability":"view","type":"function"}]`
+	infuraURL = "https://mainnet.infura.io/v3/c902a2bbbb964fbf91e82557534a826e"
+)
 
 var currentPriceETHtoUSD float64
 
@@ -87,7 +96,7 @@ func (r *CryptoAddressPostgress) GetEthBalance(id int) (*big.Float, *big.Float, 
 		return nil, nil, err
 	}
 
-	infura_client, err := ethclient.Dial("https://mainnet.infura.io/v3/c902a2bbbb964fbf91e82557534a826e")
+	infura_client, err := ethclient.Dial(infuraURL)
 	if err != nil {
 		return nil, nil, err
 	}
@@ -103,6 +112,53 @@ func (r *CryptoAddressPostgress) GetEthBalance(id int) (*big.Float, *big.Float, 
 	balanceInUSD := getEthPrice(balanceInEth)
 
 	return balanceInEth, balanceInUSD, nil
+}
+
+func (r *CryptoAddressPostgress) GetUSDTBalance(id int) (*big.Float, error) {
+	var address string
+
+	query := fmt.Sprintf("SELECT address FROM %s WHERE id_user=$1", keysTable)
+	err := r.db.Get(&address, query, id)
+	if err != nil {
+		return nil, err
+	}
+
+	client, err := ethclient.Dial(infuraURL)
+	if err != nil {
+		return nil, err
+	}
+
+	tokenAddress := common.HexToAddress(tokenUSDT)
+	accountAddress := common.HexToAddress(address)
+
+	contractABI, err := abi.JSON(strings.NewReader(erc20ABI))
+	if err != nil {
+		return nil, err
+	}
+
+	data, err := contractABI.Pack("balanceOf", accountAddress)
+	if err != nil {
+		return nil, err
+	}
+
+	callMsg := ethereum.CallMsg{
+		To:   &tokenAddress,
+		Data: data,
+	}
+
+	result, err := client.CallContract(context.Background(), callMsg, nil)
+	if err != nil {
+		return nil, err
+	}
+
+	balance := new(big.Int)
+	balance.SetBytes(result)
+
+	weiToEther := new(big.Float).SetInt(big.NewInt(0).Exp(big.NewInt(10), big.NewInt(18), nil))
+	floatBalance := new(big.Float).SetInt(balance)
+	floatBalance.Quo(floatBalance, weiToEther)
+
+	return floatBalance, nil
 }
 
 func (r *CryptoAddressPostgress) GetAddressETC(id int) (string, error) {

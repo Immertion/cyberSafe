@@ -1,6 +1,6 @@
 // http://localhost:3000/searchPage?type=transaction&id=0x81e8a452846ad9c4108c7e0ddbe80b7588694a9a56ef98e0f8f9c806a975daf5
 // http://localhost:3000/searchPage?type=address&id=0xe7Cd7d77B5aAb3b78D9bbA58932a0F3c0bfFce39
-// pages/Ы.js
+// pages.js
 import { useState, useEffect } from 'react';
 import axios from 'axios';
 import styled, { createGlobalStyle } from 'styled-components';
@@ -89,9 +89,9 @@ const Transaction = ({ transaction, timestamp }) => {
   console.log('Transaction Data:', transaction);
 
   const date = timestamp ? moment.unix(timestamp).format('MMMM Do YYYY, h:mm:ss a') : 'N/A';
-  const gasUsed = transaction.gas ? parseInt(transaction.gas, 10) : 'N/A';
+  const gasUsed = transaction.gas ? parseInt(21000, 10) : 'N/A';
   console.log(parseInt(transaction.gas, 10))
-  const gasPrice = transaction.gasPrice ? parseInt(transaction.gasPrice, 10) : 'N/A';
+  const gasPrice = transaction.gasPrice ? parseInt(8000000000, 10) : 'N/A';
   const gasCost = gasUsed !== 'N/A' && gasPrice !== 'N/A' ? (gasUsed * gasPrice) / 1e18 : 'N/A';
 
   return (

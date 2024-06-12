@@ -1,4 +1,3 @@
-import Link from 'next/link'
 import { parseISO, format, add } from 'date-fns';
 import React, { useEffect,  useState } from 'react';
 import Cookies from 'js-cookie';
@@ -7,7 +6,8 @@ import copyIcon from "../images/copy.svg"
 import etherscanIcon from "../images/etherscan-logo-circle.svg"
 import { useRouter } from 'next/router'
 
-import WalletSearch from '../components/WalletSearch';
+import Navbar from '../components/Navbar';
+import SupportButton from '../components/SupportButton';
 
 const apiKey = "U9ZR3EP6E9VZ2KGXQDM9JP5YDAXP9SB2Z5"
 const pageSize = 5
@@ -39,7 +39,7 @@ const Transaction = () => {
     useEffect(() => {
         const fetchAddress = async () => {
             try {
-                const response = await fetch("http://localhost:8080/wallet/addressETC", {
+                const response = await fetch(process.env.NEXT_PUBLIC_PROD_VERSION + "wallet/addressETC", {
                     method: 'GET',
                     headers: {
                         'Authorization': 'Bearer ' + token,
@@ -127,27 +127,20 @@ const Transaction = () => {
     }, [addressLoaded, page]);
 
 
+    function toggleMenu() {
+        const navLinks = document.getElementById('nav-links');
+        navLinks.classList.toggle('show');
+    }
+    
+        
 
 
     return ( 
         <div className="body">
-            <header>
-                <div className="navbar">
-                    <div className="logo ">
-                        CryptoSafe
-                        </div>
-                    <div className="nav-links">
-                        <Link href="home" >Home</Link>
-                        <Link href="wallet" >Wallets</Link>
-                        <Link href="transaction" className="active">Transactions</Link>
-                        <Link href="security">Settings</Link>
-                    </div>
-                    <div className="search-bar">
-                        <WalletSearch />
-                    </div>
-                </div>
-            </header>
 
+                <Navbar
+                    activeWindow="transaction"
+                />
             
             <div className="container">
                 <div className="transactionList">
@@ -221,200 +214,296 @@ const Transaction = () => {
             <footer>
                 <div className="footer-container">
                     <p>CryptoSafe</p>
+                    <SupportButton/>
                 </div>
             </footer>
         <style jsx>
             {`
 
+        .container {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            padding: 20px;
+            max-width: 800px;
+            margin: 0 auto;
+            background-color: #121212;
+            color: white;
+            font-family: Arial, sans-serif;
+        }
 
-            .container {
-                display: flex;
-                flex-direction: column;
-                gap: 20px;
-                padding: 20px;
-                max-width: 800px;
-                margin: 0 auto;
-                background-color: #121212;
-                color: white;
-                font-family: Arial, sans-serif;
+        .transactionList {
+            max-height: 65vh; /* Ограничиваем высоту контейнера */
+            overflow-y: auto; /* Добавляем вертикальную прокрутку */
+            padding-right: 10px; /* Добавим отступ для прокрутки */
+        }
+
+        .transaction {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            background-color: #1e1e1e;
+            padding: 20px;
+            border-radius: 8px;
+            border: 1px solid #333;
+            margin-bottom: 10px; /* Добавим отступ между транзакциями */
+        }
+
+        .transaction > div {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .icon {
+            font-size: 24px;
+        }
+
+        .time {
+            font-size: 16px;
+        }
+
+        .status {
+            display: flex;
+            justify-content: flex-end;
+            font-weight: bold;
+        }
+
+        .status.success {
+            color: #4caf50;
+        }
+
+        .status.failed {
+            color: #f44336;
+        }
+
+        .status.pending {
+            color: #ff9800;
+        }
+
+        .amountIn {
+            color: green;
+            font-size: 18px;
+        }
+
+        .amountOut {
+            color: red;
+            font-size: 18px;
+        }
+
+        .fee {
+            color: #ccc;
+            margin-top: 5px;
+        }
+
+        .hash {
+            display: flex;
+            align-items: center;
+            font-size: 14px;
+            color: #888;
+        }
+
+        .hash span {
+            color: white;
+            margin-right: 10px;
+            word-break: break-all; /* To ensure the hash breaks correctly */
+        }
+
+        .copyButton {
+            background: none;
+            border: none;
+            color: white;
+            cursor: pointer;
+            font-size: 16px;
+            margin-left: 10px;
+        }
+
+        .link {
+            color: white;
+            text-decoration: none;
+            font-size: 20px;
+            margin-top: 10px; /* Добавим отступ сверху для ссылки */
+            display: flex;
+            align-items: center;
+        }
+
+        .link::before {
+            margin-right: 5px;
+        }
+
+        .pagination {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-top: 20px;
+        }
+
+        .pageButton {
+            background: #333;
+            color: #fff;
+            border: 1px solid #555;
+            padding: 10px 20px;
+            cursor: pointer;
+            margin: 0 5px;
+            border-radius: 5px;
+        }
+
+        .pageButton:disabled {
+            cursor: not-allowed;
+            opacity: 0.5;
+        }
+
+        .pageInfo {
+            font-size: 1em;
+        }
+
+        .icon-button {
+            background: transparent;
+            border: none;
+            outline: none;
+            filter: invert(100%);
+            padding: 0;
+            margin: 0;
+            cursor: pointer;
+            transition: box-shadow 0.3s ease-in-out;                
+        }
+
+        .copy-button {
+            cursor: pointer;
+            border-radius: 20%;
+        }
+
+        .spinner {
+            margin-left: 48%;
+        }
+
+        .notification {
+            position: fixed;
+            right: 20px;
+            bottom: 20px;
+            background-color: #7B2EFF;
+            color: white;
+            padding: 16px;
+            border-radius: 4px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+            z-index: 1000;
+            transition: transform 0.5s, opacity 0.5s;
+            transform: translateY(100%);
+            opacity: 0;
+            animation: slideIn 0.5s forwards;
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateY(100%);
+                opacity: 0;
             }
-            
-            .transactionList {
-                max-height: 65vh; /* Ограничиваем высоту контейнера */
-                overflow-y: auto; /* Добавляем вертикальную прокрутку */
-                padding-right: 10px; /* Добавим отступ для прокрутки */
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        /* Адаптивные стили */
+        @media (max-width: 1200px) {
+            .container {
+                max-width: 700px;
+                padding: 15px;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                max-width: 100%;
+                padding: 10px;
             }
             
             .transaction {
-                display: flex;
-                flex-direction: column;
-                gap: 10px;
-                background-color: #1e1e1e;
-                padding: 20px;
-                border-radius: 8px;
-                border: 1px solid #333;
-                margin-bottom: 10px; /* Добавим отступ между транзакциями */
-            }
-            
-            .transaction > div {
-                display: flex;
-                justify-content: space-between;
-                align-items: center;
-            }
-            
-            .icon {
-                font-size: 24px;
-            }
-            
-            .time {
-                font-size: 16px;
-            }
-            
-            .status {
-                display: flex;
-                justify-content: flex-end;
-                font-weight: bold;
-            }
-            
-            .status.success {
-                color: #4caf50;
-            }
-            
-            .status.failed {
-                color: #f44336;
-            }
-            
-            .status.pending {
-                color: #ff9800;
+                padding: 15px;
             }
 
-            .amountIn {
-                color: green;
-                font-size: 18px;
-            }
-            
-            .amountOut {
-                color: red;
-                font-size: 18px;
-            }
-            .fee {
-                color: #ccc;
-                margin-top: 5px;
-            }
-            .hash {
-                display: flex;
-                align-items: center;
-                font-size: 14px;
-                color: #888;
-            }
-            
-            .hash span {
-                color: white;
-                margin-right: 10px;
-                word-break: break-all; /* To ensure the hash breaks correctly */
-            }
-            
-            .copyButton {
-                background: none;
-                border: none;
-                color: white;
-                cursor: pointer;
-                font-size: 16px;
-                margin-left: 10px;
-            }
-            
-            .link {
-                color: white;
-                text-decoration: none;
+            .icon {
                 font-size: 20px;
-                margin-top: 10px; /* Добавим отступ сверху для ссылки */
-                display: flex;
-                align-items: center;
             }
-            
-            .link::before {
-                margin-right: 5px;
+
+            .time, .amountIn, .amountOut {
+                font-size: 14px;
             }
-  
-            
-            .link::before {
-                margin-right: 5px;
+
+            .hash {
+                font-size: 12px;
             }
-            .pagination {
-                display: flex;
-                justify-content: center;
-                align-items: center;
-                margin-top: 20px;
+
+            .copyButton {
+                font-size: 14px;
             }
-            
+
+            .link {
+                font-size: 18px;
+            }
+
             .pageButton {
-                background: #333;
-                color: #fff;
-                border: 1px solid #555;
-                padding: 10px 20px;
-                cursor: pointer;
-                margin: 0 5px;
-                border-radius: 5px;
+                padding: 8px 16px;
             }
-            
-            .pageButton:disabled {
-                cursor: not-allowed;
-                opacity: 0.5;
-            }
-            
+
             .pageInfo {
-                font-size: 1em;
+                font-size: 0.9em;
             }
-            .icon-button {
-                background: transparent;
-                border: none;
-                back
-                outline: none;
-                filter: invert(100%);
-                padding: 0;
-                margin: 0;
-                cursor: pointer;
-                transition: box-shadow 0.3s ease-in-out;                
-              }
-            .copy-button {
-                /* Style your button here */
-                cursor: pointer;
-                // background-color: #555;
-                border-radius: 20%;
-              }
-              .spinner{
-                margin-left: 48%;
-                
-            }
-            
-            
 
             .notification {
-                position: fixed;
-                right: 20px;
-                bottom: 20px;
-                background-color: #7B2EFF; /* A pleasant green background */
-                color: white; /* White text color */
-                padding: 16px;
-                border-radius: 4px;
-                box-shadow: 0 2px 4px rgba(0,0,0,0.2); /* Subtle shadow for depth */
-                z-index: 1000; /* Ensure it's above other items */
-                transition: transform 0.5s, opacity 0.5s;
-                transform: translateY(100%);
-                opacity: 0;
-                /* This will make the notification slide in */
-                animation: slideIn 0.5s forwards;
-              }
-              @keyframes slideIn {
-                from {
-                  transform: translateY(100%);
-                  opacity: 0;
-                }
-                to {
-                  transform: translateY(0);
-                  opacity: 1;
-                }
-              }
+                right: 10px;
+                bottom: 10px;
+                padding: 12px;
+                font-size: 0.9em;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .container {
+                max-width: 100%;
+                padding: 5px;
+            }
+
+            .transaction {
+                padding: 10px;
+            }
+
+            .icon {
+                font-size: 18px;
+            }
+
+            .time, .amountIn, .amountOut {
+                font-size: 12px;
+            }
+
+            .hash {
+                font-size: 10px;
+            }
+
+            .copyButton {
+                font-size: 12px;
+            }
+
+            .link {
+                font-size: 16px;
+            }
+
+            .pageButton {
+                padding: 6px 12px;
+            }
+
+            .pageInfo {
+                font-size: 0.8em;
+            }
+
+            .notification {
+                right: 5px;
+                bottom: 5px;
+                padding: 10px;
+                font-size: 0.8em;
+            }
+        }
+
             `}
         </style>
         </div>

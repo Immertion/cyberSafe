@@ -17,6 +17,10 @@ func (s CryptoService) GetBalanceETC(id int) (*big.Float, *big.Float, error) {
 	return s.repo.GetEthBalance(id)
 }
 
+func (s CryptoService) GetBalanceUSDT(id int) (*big.Float, error) {
+	return s.repo.GetUSDTBalance(id)
+}
+
 func (s CryptoService) GetAddressETC(id int) (string, error) {
 	return s.repo.GetAddressETC(id)
 }
