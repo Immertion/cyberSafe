@@ -18,7 +18,7 @@ func NewMailPostgres(db *sqlx.DB) *MailPostgres {
 func (r *MailPostgres) SendCodeActivation(id int, rdmKey string) (string, error) {
 	var mail string
 
-	query1 := fmt.Sprintf("UPDATE %s SET activation_code=$1 WHERE id=$2", userTable)
+	query1 := fmt.Sprintf("UPDATE %s SET activate_code=$1 WHERE id=$2", userTable)
 	row := r.db.QueryRow(query1, rdmKey, id)
 	if err := row.Scan(&id); err != nil {
 	}
@@ -51,7 +51,7 @@ func (r *MailPostgres) SendPrivateKey(id int) (string, string, error) {
 }
 
 type CodeActivation struct {
-	CodeActivation string `db:"activation_code"`
+	CodeActivation string `db:"activate_code"`
 	Confirmed      bool   `db:"confirmed"`
 }
 
@@ -59,7 +59,7 @@ func (r *MailPostgres) CheckCodeActivation(id int, rdmKey, iconURL string) (bool
 	var cdActv CodeActivation
 	var verified bool
 
-	query1 := fmt.Sprintf("SELECT activation_code, confirmed FROM %s WHERE id=$1", userTable)
+	query1 := fmt.Sprintf("SELECT activate_code, confirmed FROM %s WHERE id=$1", userTable)
 	err := r.db.Get(&cdActv, query1, id)
 	if err != nil {
 		return false, err

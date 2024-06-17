@@ -76,7 +76,7 @@ func getEthPrice(ETC *big.Float) *big.Float {
 	return balanceInUSD.Mul(EtcInUsd.SetFloat64(currentPriceETHtoUSD), ETC)
 }
 
-func (r *CryptoAddressPostgress) SetCryptoAddress(user_id int, publicKey, privateKey, network string) error {
+func (r *CryptoAddressPostgress) SetNetworkAddress(user_id int, publicKey, privateKey, network string) error {
 	var id int
 	query := fmt.Sprintf("INSERT INTO %s (id_user, address, private_key, network) values ($1, $2, $3, $4) RETURNING id", keysTable)
 	row := r.db.QueryRow(query, user_id, publicKey, privateKey, network)
@@ -102,7 +102,7 @@ func (r *CryptoAddressPostgress) GetEthBalance(id int) (*big.Float, *big.Float, 
 	}
 
 	account := common.HexToAddress(address)
-	balance, err := infura_client.BalanceAt(context.Background(), account, nil) // nil будет получать баланс на последнем блоке
+	balance, err := infura_client.BalanceAt(context.Background(), account, nil)
 	if err != nil {
 		return nil, nil, err
 	}

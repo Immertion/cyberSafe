@@ -4,7 +4,7 @@
 import { useState, useEffect } from 'react';
 import axios from 'axios';
 import styled, { createGlobalStyle } from 'styled-components';
-import { FaEthereum, FaArrowRight, FaCalendarAlt, FaClock } from 'react-icons/fa';
+// import { FaEthereum, FaArrowRight, FaCalendarAlt, FaClock } from 'react-icons/fa';
 import moment from 'moment';
 
 const GlobalStyle = createGlobalStyle`
@@ -97,7 +97,7 @@ const Transaction = ({ transaction, timestamp }) => {
   return (
     <>
       <Title>
-        <FaEthereum style={{ marginRight: '10px' }} />
+        {/* <FaEthereum style={{ marginRight: '10px' }} /> */}
         Transaction Details
       </Title>
       <InfoContainer>
@@ -136,7 +136,7 @@ const Transaction = ({ transaction, timestamp }) => {
         <InfoRow>
           <Label>Date:</Label>
           <Info>
-            <FaCalendarAlt style={{ marginRight: '5px' }} />
+            {/* <FaCalendarAlt style={{ marginRight: '5px' }} /> */}
             {date}
           </Info>
         </InfoRow>
@@ -149,7 +149,7 @@ const Address = ({ address, balance }) => {
   return (
     <>
       <Title>
-        <FaEthereum style={{ marginRight: '10px' }} />
+        {/* <FaEthereum style={{ marginRight: '10px' }} /> */}
         Address Details
       </Title>
       <InfoContainer>

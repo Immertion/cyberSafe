@@ -24,60 +24,60 @@ const PersonalArea = () => {
 
     const token = Cookies.get('jwtToken');
 
-    useEffect(() => {
-        if (token == null) {
-            router.push("auth")
-        }
-    })
-
     const handleLogout = () => {
         Cookies.remove('jwtToken');
         router.push("auth")
     };
 
     useEffect(() => {
-        const fetchAddress = async () => {
-            try {
-                const response = await fetch(process.env.NEXT_PUBLIC_PROD_VERSION + "wallet/addressETC", {
-                    method: 'GET',
-                    headers: {
-                        'Authorization': 'Bearer ' + token,
-                    },
-                });
-                if (!response.ok) {
-                    throw new Error('Network response was not ok ' + response.statusText);
-                }
-                const data = await response.json();
-                setAddress(data);
-                setBlockies(GeneratedIcon(address))
-                setAddressLoaded(false);
-            } catch (error) {
-                console.error('There was a problem with your fetch operation:', error);
+      if (token == null) {
+        router.push("auth")
+      }
+
+      const fetchAddress = async () => {
+          try {
+              const response = await fetch(process.env.NEXT_PUBLIC_PROD_VERSION + "wallet/addressETC", {
+                  method: 'GET',
+                  headers: {
+                      'Authorization': 'Bearer ' + token,
+                  },
+              });
+              if (!response.ok) {
+                  throw new Error('Network response was not ok ' + response.statusText);
+              }
+              const data = await response.json();
+              setAddress(data);
+              setBlockies(GeneratedIcon(address))
+              setAddressLoaded(false);
+          } catch (error) {
+              console.error('There was a problem with your fetch operation:', error);
+          }
+      };
+      fetchAddress();
+
+      const fetchUserName= async () => {
+        try {
+            const response = await fetch(process.env.NEXT_PUBLIC_PROD_VERSION + "user/userName", {
+                method: 'GET',
+                headers: {
+                    'Authorization': 'Bearer ' + token,
+                },
+            });
+            if (!response.ok) {
+                throw new Error('Network response was not ok ' + response.statusText);
             }
-        };
-        fetchAddress();
+            const data = await response.json();
+            setUserName(data);
+        } catch (error) {
+            console.error('There was a problem with your fetch operation:', error);
+        }
+    };
+    fetchUserName();
+
+    
     })
 
-    useEffect(() => {
-        const fetchUserName= async () => {
-            try {
-                const response = await fetch(process.env.NEXT_PUBLIC_PROD_VERSION + "user/userName", {
-                    method: 'GET',
-                    headers: {
-                        'Authorization': 'Bearer ' + token,
-                    },
-                });
-                if (!response.ok) {
-                    throw new Error('Network response was not ok ' + response.statusText);
-                }
-                const data = await response.json();
-                setUserName(data);
-            } catch (error) {
-                console.error('There was a problem with your fetch operation:', error);
-            }
-        };
-        fetchUserName();
-    })
+
 
     const SendPrivateKey = async () => {
         document.getElementById('loadingBackground').style.display = 'flex'

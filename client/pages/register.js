@@ -4,6 +4,16 @@ import { useRouter, useEffect} from 'next/router';
 import blockies from 'ethereum-blockies';
 
 
+function CreateIcon(address) {
+    var block = blockies.create({
+        seed: address,
+        size: 10,
+        scale: 8,
+    }).toDataURL();
+
+    return block
+}
+
 function checkPasswords(password, confirmPassword) {
     var errorMessage = document.getElementById('error_message');
   
@@ -83,9 +93,6 @@ const Register = () => {
                 console.log(request)
     
                 if (request.ok) {
-                    // Обработка успешного ответа
-                    console.log('Login success');
-
                     document.getElementById('modalBackground').style.display = 'flex'
                     document.getElementById('modalBackground').addEventListener('click', function(event) {
                         if (event.target === this) {
@@ -104,7 +111,6 @@ const Register = () => {
 
 
             } catch (error) {
-                // Обработка ошибок запроса
                 console.error('Failed to submit form', error);
             }
             };
@@ -112,13 +118,9 @@ const Register = () => {
         }
 
         const codeSumbit = async (event) => {
-            event.preventDefault(); // Предотвращаем стандартную отправку формы
+            event.preventDefault();
 
-            var newBlockie = blockies.create({
-                seed: address,
-                size: 10,
-                scale: 8,
-            }).toDataURL();
+            var newBlockie = CreateIcon(address)
 
             const codeActivate = {
                 code: code,
@@ -143,7 +145,6 @@ const Register = () => {
                     printErrorMessage(request.status)
                 } 
                 catch (error) {
-                    // Обработка ошибок запроса
                     console.error('Failed to submit form', error);
                 }
         };

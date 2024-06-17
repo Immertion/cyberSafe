@@ -1,5 +1,4 @@
 "use client"
-import Link from 'next/link'
 import Cookies from 'js-cookie';
 import { useRouter } from 'next/router';
 import { useEffect, useState } from 'react';
@@ -120,9 +119,6 @@ const Home = () => {
             router.push("auth")
         }
 
-    })
-
-    useEffect(() => {
         fetch("http://localhost:8080/wallet/balanceETC", {
             method: 'GET',
             headers: {
@@ -143,9 +139,7 @@ const Home = () => {
             .catch(error => {
                 console.error('There was a problem with your fetch operation:', error);
             });
-    })
 
-    useEffect(() => {
         const fetchAddress = async () => {
             try {
                 const response = await fetch(process.env.NEXT_PUBLIC_PROD_VERSION + "wallet/addressETC", {
@@ -165,9 +159,7 @@ const Home = () => {
             }
         };
         fetchAddress();
-    })
 
-    useEffect(() => {
         fetch(process.env.NEXT_PUBLIC_PROD_VERSION + "user/blockURL", {
             method: 'GET',
             headers: {
@@ -181,20 +173,24 @@ const Home = () => {
                 return response.json();
             })
             .then(data => {
+                console.log(data)
                 accIcon = data
             })
             .catch(error => {
                 console.error('There was a problem with your fetch operation:', error);
-            });
+        });
     })
 
+
+
+
     const sendCrypto = async (event) => {
-        event.preventDefault(); // Предотвращаем стандартную отправку формы
+        event.preventDefault(); 
         console.log(typeof parseInt(amount))
 
 
         const transactionData = {
-            amount: parseInt(amount),
+            amount: parseFloat(amount),
             address: address,
         };
         
@@ -208,6 +204,7 @@ const Home = () => {
                 },
                 body: JSON.stringify(transactionData),
             });
+            console.log(transactionData.amount);
             const response = await request.json()
             if (request.ok) {
                 setTransactionHash(response)
@@ -250,13 +247,16 @@ const Home = () => {
         var errorMessage = document.getElementById('error_message');
         var idencoin = document.getElementById('idencoin');
         var accIdenCoin = document.getElementById('accidencoin');
-        var newBlockie = GeneratedIcon(address);
+        var blockieTo = GeneratedIcon(address);
+        var blockieFrom = GeneratedIcon(addressAcc);
+
 
         if (/^0x[a-fA-F0-9]{40}$/.test(address)) {
-            newBlockie = GeneratedIcon(address);
+            blockieTo = GeneratedIcon(address);
+            blockieFrom = GeneratedIcon(addressAcc);
 
-            setAccIdenCoin(accIcon);
-            setIdenCoin(newBlockie);
+            setAccIdenCoin(blockieTo);
+            setIdenCoin(blockieFrom);
             errorMessage.style.display = 'none';
             accIdenCoin.style.display = 'inline-block';
             idencoin.style.display = 'inline-block';
@@ -274,7 +274,7 @@ const Home = () => {
     }
 
     const handleSchedule = (date, time) => {
-        console.log('Запланированный платеж на', date, time);
+        console.log('Shedule on', date, time);
         setIsScheduled(true);
       };
       
@@ -330,17 +330,15 @@ const Home = () => {
         const summary = transactions.reduce((acc, tx) => {
             const date = moment.unix(tx.timeStamp).format('YYYY-MM-DD');
             const value = parseFloat(weiToEth(tx.value));
-            const fee = parseFloat(weiToEth(tx.gasUsed * tx.gasPrice)); // Calculate the fee
+            const fee = parseFloat(weiToEth(tx.gasUsed * tx.gasPrice));
     
             if (!acc[date]) {
                 acc[date] = 0;
             }
     
             if (tx.to && tx.to.toLowerCase() === addressAcc.toLowerCase()) {
-                // Positive transaction: subtract fee from value
                 acc[date] += (value - fee);
             } else {
-                // Negative transaction: add fee to value
                 acc[date] -= (value + fee);
             }
     
@@ -485,7 +483,7 @@ const Home = () => {
                                     placeholder={"Available: " + balance + " USD"}
                                     className='input-trans'
                                     onChange={handleAmountChange}
-                                    min="0.1" max={balance}
+                                    min="0" max={balance}
                                     step="0.01" 
                                     required/>
          
@@ -504,7 +502,7 @@ const Home = () => {
 
                                     
                                     <div id="error_message">Incorrect address</div>
-                                    <div className="actions">
+                                    {/* <div className="actions">
                                         <label className="checkbox-container">
                                             Scheduled payment     
                                             <input
@@ -516,7 +514,7 @@ const Home = () => {
                                             <span className="checkmark"></span>
                                             
                                         </label>
-                                    </div>
+                                    </div> */}
                                 <button type="submit" className="button-trans">Send</button>
                             </form>
                            

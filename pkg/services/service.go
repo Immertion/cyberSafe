@@ -19,7 +19,7 @@ type Mail interface {
 }
 
 type GenerateKeys interface {
-	GenerateKeysEtherium(user_id int) error
+	GenerateKeysById(user_id int, network string) error
 }
 
 type Crypto interface {

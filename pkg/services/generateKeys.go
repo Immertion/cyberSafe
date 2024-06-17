@@ -18,7 +18,7 @@ func NewGenerateKeysService(repo repository.CryptoAddress) *GenerateKeysService 
 	return &GenerateKeysService{repo: repo}
 }
 
-func (s GenerateKeysService) GenerateKeysEtherium(user_id int) error {
+func (s GenerateKeysService) GenerateKeysById(user_id int, network string) error {
 	privateKey, err := ecdsa.GenerateKey(elliptic.P256(), rand.Reader)
 	if err != nil {
 		return err
@@ -36,5 +36,5 @@ func (s GenerateKeysService) GenerateKeysEtherium(user_id int) error {
 	address := fmt.Sprint(crypto.PubkeyToAddress(*publicKeyECDSA))
 	// fmt.Println("Ethereum Address:", addressECDSA)
 
-	return s.repo.SetCryptoAddress(user_id, address, privateKeyString, "ETC")
+	return s.repo.SetNetworkAddress(user_id, address, privateKeyString, network)
 }

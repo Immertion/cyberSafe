@@ -35,8 +35,7 @@ const Transaction = () => {
         if (token == null){
             router.push("auth")
         }
-    })
-    useEffect(() => {
+
         const fetchAddress = async () => {
             try {
                 const response = await fetch(process.env.NEXT_PUBLIC_PROD_VERSION + "wallet/addressETC", {
@@ -125,15 +124,6 @@ const Transaction = () => {
             fetchEthToUsd();
         }
     }, [addressLoaded, page]);
-
-
-    function toggleMenu() {
-        const navLinks = document.getElementById('nav-links');
-        navLinks.classList.toggle('show');
-    }
-    
-        
-
 
     return ( 
         <div className="body">

@@ -18,13 +18,12 @@ const Wallet = () => {
     const token = Cookies.get('jwtToken');
     const router = useRouter()
     
+
     useEffect(() => {
         if (token == null){
             router.push("auth")
         }
-    })
 
-    useEffect(() => {
         fetch(process.env.NEXT_PUBLIC_PROD_VERSION + "wallet/addressETC",{
             method: 'GET',
             headers: {
@@ -39,17 +38,11 @@ const Wallet = () => {
         })
         .then(data => {
             setAddress(data)
-    })
+        })
         .catch(error => {
             console.error('There was a problem with your fetch operation:', error);
         });
-    })
-        
 
-
-
-
-    useEffect(() => {
         fetch(process.env.NEXT_PUBLIC_PROD_VERSION + "wallet/balanceETC",{
             method: 'GET',
             headers: {
@@ -65,13 +58,11 @@ const Wallet = () => {
         .then(data => { 
             setBalanceETH((("balance - " + (data)["balanceCrypto"].toFixed(8))) + " ETH")
 
-    })
+        })
         .catch(error => {
             console.error('There was a problem with your fetch operation:', error);
         });
-    })
 
-    useEffect(() => {
         fetch(process.env.NEXT_PUBLIC_PROD_VERSION + "wallet/balanceUSDT",{
             method: 'GET',
             headers: {
@@ -91,10 +82,6 @@ const Wallet = () => {
             console.error('There was a problem with your fetch operation:', error);
         });
     })
-
-
-
-
 
     return ( 
         <div className="body">

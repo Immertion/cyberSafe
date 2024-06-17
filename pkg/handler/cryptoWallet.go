@@ -90,7 +90,7 @@ func (h *Handler) GetGasPrice(c *gin.Context) {
 
 type sendDataTransaction struct {
 	Address string  `json:"address" binding:"required"`
-	Amount  float64 `json:"amount" binding:"required"`
+	Amount  float64 `json:"amount"`
 }
 
 func (h *Handler) SendTransactionETH(c *gin.Context) {
@@ -100,7 +100,6 @@ func (h *Handler) SendTransactionETH(c *gin.Context) {
 		newErrorResponse(c, http.StatusBadRequest, err.Error())
 		return
 	}
-
 	authHeader := c.GetHeader("Authorization")
 	token := strings.TrimPrefix(authHeader, "Bearer ")
 

@@ -19,7 +19,7 @@ type Mail interface {
 }
 
 type CryptoAddress interface {
-	SetCryptoAddress(user_id int, publicKey, privateKey, network string) error
+	SetNetworkAddress(user_id int, publicKey, privateKey, network string) error
 	GetEthBalance(id int) (*big.Float, *big.Float, error)
 	GetUSDTBalance(id int) (*big.Float, error)
 	GetAddressETC(id int) (string, error)
